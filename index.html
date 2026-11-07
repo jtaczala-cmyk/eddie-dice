@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17100d">
+<title>Eddie's Dice of the Beast</title>
+<link rel="stylesheet" href="style.css">
+<script src="engine.js" defer></script><script src="game.js" defer></script>
+</head>
+<body>
+<div id="intro" class="intro" aria-label="Filmowe wprowadzenie">
+  <img class="intro-scene" src="Eddie_Dice_Scene.jpg" alt="Eddie w cylindrze przy drewnianym stole z pięcioma kośćmi">
+  <img class="intro-portrait" src="Eddie_Portrait_Crop.jpg" alt="Eddie wskazuje na ciebie">
+  <div class="intro-shade"></div>
+  <div class="intro-copy"><p id="intro-kicker">THE TABLE HAS BEEN WAITING.</p><h1 id="intro-title">Five bones.<br>One invitation.</h1><p id="intro-sub">“Pull up a chair. Let your courage do the counting.”</p></div>
+  <button id="skip-intro" class="outline">Pomiń intro <span aria-hidden="true">↗</span></button>
+  <div class="intro-progress"></div>
+</div>
+<div class="app-shell">
+<header class="masthead">
+  <a class="wordmark" href="#" aria-label="Eddie's Dice of the Beast"><span>EDDIE'S</span><strong>DICE <i>of the</i> BEAST</strong><small>A GAME OF IRON AND CHANCE</small></a>
+  <nav aria-label="Opcje gry"><button id="sound" class="icon-button" aria-pressed="false">Dźwięk: wył.</button><button id="rules-open" class="icon-button">Zasady</button><button id="new-game" class="outline">Nowa gra ↻</button></nav>
+</header>
+<main>
+  <section class="arena" aria-label="Stół gry">
+    <div class="table-top"><div><p class="eyebrow">POJEDYNEK O LOS</p><h1>Stół należy do odważnych.</h1></div><div class="round"><span>RUNDA</span><strong id="round">01 <em>/ 13</em></strong></div></div>
+    <div class="duel" id="duel">
+      <div class="seat" aria-label="Eddie siedzi naprzeciwko ciebie">
+        <div class="candle left" aria-hidden="true"></div><div class="candle right" aria-hidden="true"></div>
+        <div id="avatar" class="avatar idle" data-mood="idle"><div class="body"><img src="Eddie_Portrait_Crop.jpg" alt="Eddie, twój przeciwnik w cylindrze, siedzi naprzeciwko i wskazuje na ciebie"></div><div class="eye-glow" aria-hidden="true"></div></div>
+        <div class="speech" id="bubble"><span class="eyebrow">EDDIE MÓWI</span><p id="quote" aria-live="polite">“The chair is yours. The odds are not.”</p></div>
+      </div>
+      <div class="table-edge" aria-hidden="true"></div>
+      <div class="table-felt">
+        <div class="turn-line"><span id="turn-label" class="turn-pill">TWÓJ RUCH</span><span id="roll-counter">RZUT — / 3</span></div>
+        <div id="dice" class="dice-tray" aria-label="Kości na stole"></div>
+        <div class="eddie-hand"><div><span class="eyebrow">EDDIE</span><p id="eddie-action" aria-live="polite">Czeka na twój pierwszy ruch.</p></div><div id="eddie-dice" class="mini-dice" aria-label="Kości Eddiego"></div></div>
+      </div>
+      <div class="near-side">
+        <p id="hint" class="hint" aria-live="polite">Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.</p>
+        <div class="roll-actions"><button id="roll" class="primary">Rzuć kośćmi <span>↗</span></button><span id="roll-note">Do 3 rzutów na turę</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="scorecard" aria-labelledby="score-title">
+    <div class="score-heading"><div><p class="eyebrow">TRZYNAŚCIE DRÓG DO CHWAŁY</p><h2 id="score-title">Karta przeznaczenia</h2></div><span class="ornament" aria-hidden="true">✦</span></div>
+    <div class="scores-top"><div><span>TY</span><strong id="player-total">0</strong></div><span class="versus">VS</span><div><span>EDDIE</span><strong id="eddie-total">0</strong></div></div>
+    <p class="score-help">Po rzucie kliknij wolną kategorię w kolumnie „Ty”.</p>
+    <table><thead><tr><th scope="col">Kategoria</th><th scope="col">Ty</th><th scope="col">Eddie</th></tr></thead><tbody id="upper-rows"></tbody><tbody class="bonus-rows"><tr><th scope="row">Suma górna</th><td id="player-upper">0 / 63</td><td id="eddie-upper">0 / 63</td></tr><tr><th scope="row">Premia <small>≥ 63 → +35</small></th><td id="player-bonus">0</td><td id="eddie-bonus">0</td></tr></tbody><tbody id="lower-rows"></tbody><tfoot><tr><th scope="row">RAZEM</th><td id="player-footer">0</td><td id="eddie-footer">0</td></tr></tfoot></table>
+  </section>
+</main>
+<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro">Obejrzyj intro ↗</button><span>5 KOŚCI · 13 RUND · ŻADNEJ LITOŚCI</span></footer>
+</div>
+<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu przez 13 rund. Każdy z was raz w rundzie zapisuje wynik w jednej wolnej kategorii.</p><ol><li>Rzuć pięcioma kośćmi. Kliknij kości, aby je zatrzymać lub odblokować.</li><li>Możesz rzucić jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie kliknij kategorię na swojej karcie. Możesz wpisać także zero — decyzji nie da się cofnąć.</li><li>Eddie rozgrywa swoją turę. Po 13 rundach wygrywa wyższy wynik; równy wynik to remis.</li></ol><p><b>Góra:</b> suma wskazanych oczek. Zdobądź 63 punkty w górnej sekcji, a dostaniesz premię 35.</p><p><b>Trójka / kareta:</b> suma wszystkich kości, jeśli masz co najmniej 3 / 4 jednakowe. <b>Full:</b> dokładnie para i trójka, 25 pkt. <b>Mały strit:</b> co najmniej 4 kolejne wartości, 30 pkt. <b>Duży strit:</b> 5 kolejnych wartości, 40 pkt. <b>Generał:</b> 5 jednakowych, 50 pkt. <b>Szansa:</b> suma wszystkich kości.</p><p class="muted">Klasyczny zapis bez dodatkowych premii za kolejne Generały i bez reguły jokera. Podświetlone liczby pokazują bieżące możliwości, nie zapisany wynik. Dźwięki są syntezowane lokalnie, bez muzyki.</p><button class="primary close-dialog">Do stołu</button></dialog>
+<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz kartę</button></dialog>
+</body></html>
