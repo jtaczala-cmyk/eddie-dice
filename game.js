@@ -3,6 +3,7 @@ const E=DiceEngine, $=id=>document.getElementById(id);
 let state,version=0,sound=false,audio,rolling=false,introTimer,introRun=0;
 const pips={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const lines={
+ rolling:["Five little bones. Hear them argue.","Don't blink. Fortune hates an audience.","The table is listening.","Throw them like you mean the deal.","Listen — five verdicts in the air.","The hat is watching the bounce.","A gentleman never flinches at the rattle.","These bones remember every coward.","Let them dance. Then pick your truth.","Keep what you trust. The rest can fall."],
  welcome:['The chair is yours. The odds are not.','Five little bones. Let us see what they remember.'],
  great:['Now that is a hand worth haunting.','The table trembles. I almost approve.','You have put a crack in the darkness.'],
  beast:['Five faces, one verdict. Even the shadows stand to applaud.','Every bone agrees. That is a dangerous kind of harmony.'],
@@ -20,6 +21,7 @@ const lines={
 lines.normal.push('Every roll is a door. Some open onto stairs going down.','Luck wears gloves. You never see her fingerprints.');
 lines.eddie.push('Mind your fingers. These bones bite.','Watch closely. I only cheat in stories.');
 const foreign={
+ rolling:[['pl','Pięć małych kości. Posłuchaj, jak się spierają.'],['pl','Stół nadstawia ucha. Nie zawiedź go.'],['pl','Cylinder czuwa nad każdym odbiciem.'],['pl','Niech zatańczą. Potem wybierzesz, komu ufasz.'],['pl','Rzuć odważnie. Wahanie nie daje punktów.'],['pl','Dżentelmen nie drży na dźwięk kości.'],['pt','Cinco dados no ar. A mesa prende a respiração.'],['es','Que rueden. El sombrero contará los rebotes.'],['ja','五つの骨が踊る。卓は静かに見守る。'],['de','Lass sie tanzen. Der Tisch zählt jeden Schritt.'],['fr','Cinq dés en voyage. La table attend leur récit.']],
  normal:[['pt','A sorte sussurra. Eu prefiro quando ela grita.'],['pt','Cada dado guarda um segredo de seis faces.'],['es','Quien guarda un dado guarda una promesa.'],['pl','Kość nie pamięta, ale stół tak.'],['ja','六つの面、六つの裏切り。'],['de','Jeder Würfel hat sechs Arten zu lügen.'],['fr','Le destin roule, il ne marche jamais.'],['es','La mesa recuerda cada duda.'],['pl','Nie każda odwaga mieści się w dłoni.'],['ja','さあ、運命を卓上に投げてみろ。'],['de','Der Tisch vergisst kein Zögern.'],['fr','Le hasard a des dents. Garde tes doigts.']],
  great:[['pt','Até as sombras aplaudem essa mão.'],['es','Hasta la oscuridad reconoce esa jugada.'],['pl','Nawet cień uchyla przed tobą kapelusza.'],['ja','影さえ、その一投に頭を下げる。'],['de','Selbst die Schatten verneigen sich.'],['fr','Même les ombres saluent ce lancer.']],
  bad:[['pt','Tanta coragem para tão poucos pontos.'],['es','Tu esperanza pesa más que esos puntos.'],['pl','Wiele hałasu, niewiele oczek.'],['ja','勇気は立派だ。点数はどうかな。'],['de','Viel Mut. Erstaunlich wenig Punkte.'],['fr','Quel courage pour si peu de points.']],
@@ -43,16 +45,41 @@ function say(type,m) {
  mood(m||moodFor[type]||'speaking');
  return {text,lang};
 }
-function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(state.turn==='player'&&!rolling){say('idle');scheduleChatter();}},12000+Math.random()*6000);}
-function clickSound() {
- if(!sound)return;
- try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();audio.resume();
- for(let i=0;i<5;i++){const osc=audio.createOscillator(),gain=audio.createGain(),t=audio.currentTime+i*.04;osc.type='triangle';osc.frequency.setValueAtTime(150+Math.random()*250,t);osc.frequency.exponentialRampToValueAtTime(50,t+.055);gain.gain.setValueAtTime(.07,t);gain.gain.exponentialRampToValueAtTime(.001,t+.065);osc.connect(gain);gain.connect(audio.destination);osc.start(t);osc.stop(t+.07);}}catch(_){/* Audio is optional. */}
+function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(state.turn==='player'&&!rolling&&$('intro').hidden){say('idle');scheduleChatter();}},12000+Math.random()*6000);}
+// Table SFX never share playback or volume with the separate intro film.
+const activeSfx=new Set();
+function stopTableSound(){for(const voice of activeSfx){try{voice.pause();voice.currentTime=0;}catch(_){}}activeSfx.clear();if(audio)audio.suspend().catch(()=>{});}
+function fallbackSound(kind){
+ if(!sound||!$('intro').hidden)return;
+ try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});
+ const duration=kind==='landing'?.22:.11,buffer=audio.createBuffer(1,Math.ceil(audio.sampleRate*duration),audio.sampleRate),data=buffer.getChannelData(0);
+ let low=0;for(let i=0;i<data.length;i++){const t=i/audio.sampleRate;low=.65*low+.35*(Math.random()*2-1);data[i]=(low*.45+Math.sin(t*2*Math.PI*210)*.16)*Math.exp(-t*38);}
+ const source=audio.createBufferSource();source.buffer=buffer;source.connect(audio.destination);source.start();
+ }catch(_){/* Audio is optional; scoring must remain available. */}
+}
+function tableSound(kind){
+ if(!sound||!$('intro').hidden)return;
+ const voice=new Audio('sfx/'+kind+'.wav');voice.volume=.7;activeSfx.add(voice);let failed=false;
+ const fail=()=>{activeSfx.delete(voice);if(!failed){failed=true;fallbackSound(kind);}};
+ voice.onended=()=>activeSfx.delete(voice);voice.onerror=fail;
+ try{const playing=voice.play();if(playing)playing.catch(fail);}catch(_){fail();}
+}
+function clearThrow(){
+ $('roll-line').classList.remove('visible');$('duel').classList.remove('in-flight','impact','gold-hand');
+}
+function startThrow(){
+ clearThrow();const spoken=say('rolling','throwing');$('roll-line').textContent='“'+spoken.text+'”';$('roll-line').lang=spoken.lang;
+ $('roll-line').classList.add('visible');$('duel').classList.add('in-flight');tableSound('rattle');
+}
+function landThrow(dice,held=state.held){
+ $('roll-line').classList.remove('visible');$('duel').classList.remove('in-flight');
+ $('duel').classList.add('impact');if(['great','beast'].includes(classify(dice)))$('duel').classList.add('gold-hand');
+ [...$('dice').children].forEach((b,i)=>{if(!held[i]){b.style.setProperty('--die-delay',i*22+'ms');b.classList.add('landed');}});
 }
 function dieContents(value){return Array.from({length:9},(_,i)=>pips[value].includes(i)?'<span class="pip" aria-hidden="true"></span>':'<span></span>').join('');}
 function renderDice() {
  const tray=$('dice');tray.replaceChildren();
- state.dice.forEach((v,i)=>{const b=document.createElement('button');b.className='die'+(state.held[i]?' held':'');b.style.setProperty('--tilt',[-5,3,-2,5,-3][i]+'deg');b.innerHTML=dieContents(v);b.disabled=state.turn!=='player'||state.rolls===0||rolling||state.rolls>=3;b.setAttribute('aria-label',`Kość ${i+1}: ${state.rolls?v:'jeszcze nie rzucona'}${state.held[i]?', zatrzymana':''}`);b.setAttribute('aria-pressed',String(state.held[i]));b.onclick=()=>{state.held[i]=!state.held[i];renderDice();$('dice').children[i].focus({preventScroll:true});};tray.append(b);});
+ state.dice.forEach((v,i)=>{const b=document.createElement('button');b.className='die'+(state.held[i]?' held':'');b.style.setProperty('--tilt',[-5,3,-2,5,-3][i]+'deg');b.innerHTML=dieContents(v);b.disabled=state.turn!=='player'||state.rolls===0||rolling||state.rolls>=3;b.setAttribute('aria-label',`Kość ${i+1}: ${state.rolls?v:'jeszcze nie rzucona'}${state.held[i]?', zatrzymana':''}`);b.setAttribute('aria-pressed',String(state.held[i]));b.onclick=()=>{state.held[i]=!state.held[i];tableSound('hold');renderDice();$('dice').children[i].focus({preventScroll:true});};tray.append(b);});
 }
 function renderMini(dice=state.eddieDice,held=[]) {
  $('eddie-dice').innerHTML=dice.map((v,i)=>`<span class="mini-die${held[i]?' kept':''}" aria-label="${v}">${['','⚀','⚁','⚂','⚃','⚄','⚅'][v]}</span>`).join('');
@@ -86,22 +113,31 @@ const randomDie=()=>1+Math.floor(Math.random()*6);
 function classify(dice){if(E.score('yahtzee',dice))return 'beast';if(E.score('large',dice)||E.score('full',dice)||E.score('four',dice))return 'great';if(dice.reduce((a,b)=>a+b,0)<=13)return 'bad';return 'normal';}
 async function playerRoll(){
  if(state.turn!=='player'||state.rolls>=3||rolling)return;
- clearTimeout(chatTimer);const token=version;rolling=true;render();clickSound();
- const buttons=[...$('dice').children];buttons.forEach((b,i)=>{if(!state.held[i])b.classList.add('rolling');});
- for(let k=0;k<6;k++){await delay(65);if(token!==version)return;buttons.forEach((b,i)=>{if(!state.held[i])b.innerHTML=dieContents(randomDie());});}
+ clearTimeout(chatTimer);const token=version;rolling=true;render();
+ await tumble(token,state.held);if(token!==version)return;
  state.dice=state.dice.map((v,i)=>state.held[i]?v:randomDie());state.rolls++;rolling=false;
- say(classify(state.dice));scheduleChatter();$('hint').textContent=state.rolls<3?'Kliknij kości, aby je zatrzymać, albo wybierz kategorię na karcie.':'To ostatni rzut. Wybierz jedną wolną kategorię na karcie.';render();
+ say(classify(state.dice));scheduleChatter();$('hint').textContent=state.rolls<3?'Kliknij kości, aby je zatrzymać, albo wybierz kategorię na karcie.':'To ostatni rzut. Wybierz jedną wolną kategorię na karcie.';render();landThrow(state.dice);
 }
 async function assign(id){
  if(state.turn!=='player'||!state.rolls||rolling||state.player[id]!==undefined)return;
- clearTimeout(chatTimer);state.player[id]=E.score(id,state.dice);state.turn='eddie';$('hint').textContent='Twój wynik został zapisany. Teraz kości przejmuje Eddie.';render();await eddieTurn(version);
+ clearTimeout(chatTimer);tableSound('stamp');state.player[id]=E.score(id,state.dice);state.turn='eddie';$('hint').textContent='Twój wynik został zapisany. Teraz kości przejmuje Eddie.';render();await eddieTurn(version);
 }
-async function tumble(token,held){const bs=[...$('dice').children];bs.forEach((b,i)=>{if(!held[i])b.classList.add('rolling');});for(let k=0;k<6;k++){await delay(65);if(token!==version)return;bs.forEach((b,i)=>{if(!held[i])b.innerHTML=dieContents(randomDie());});}}
+async function tumble(token,held){
+ startThrow();const bs=[...$('dice').children],loose=bs.map((_,i)=>i).filter(i=>!held[i]);
+ bs.forEach((b,i)=>{if(!held[i]){b.style.setProperty('--die-delay',i*31+'ms');b.classList.add('rolling');}});
+ for(let k=0;k<16;k++){
+  await delay(65);if(token!==version)return;
+  if(k>=2&&k<2+loose.length)tableSound('clack-'+(1+Math.floor(Math.random()*3)));
+  if(k===13&&loose.length)tableSound('landing');
+  bs.forEach((b,i)=>{if(!held[i])b.innerHTML=dieContents(randomDie());});
+ }
+}
+
 async function eddieTurn(token){
  clearTimeout(chatTimer);$('duel').classList.add('eddie-turn');state.held=Array(5).fill(false);renderDice();say('eddie','speaking');let dice=[],held=Array(5).fill(false);$('roll-counter').textContent='RZUT — / 3';
  for(let n=1;n<=3;n++){
   await delay(n===1?650:750);if(token!==version)return;
-  dice=n===1?Array.from({length:5},randomDie):dice.map((v,i)=>held[i]?v:randomDie());mood('throwing',800);await tumble(token,held);if(token!==version)return;state.eddieDice=dice;state.dice=dice;state.held=Array(5).fill(false);renderDice();renderMini(dice);clickSound();
+  dice=n===1?Array.from({length:5},randomDie):dice.map((v,i)=>held[i]?v:randomDie());mood('throwing',800);await tumble(token,held);if(token!==version)return;state.eddieDice=dice;state.dice=dice;state.held=Array(5).fill(false);renderDice();renderMini(dice);landThrow(dice,held);
   $('roll-counter').textContent=`RZUT ${n} / 3`;$('eddie-action').textContent=`Rzut ${n}/3 · Eddie przygląda się kościom…`;
   say(E.score('yahtzee',dice)?'beast':classify(dice)==='great'?'eddieGreat':classify(dice)==='bad'?'eddieBad':'eddie');
   if(n===3)break;
@@ -113,7 +149,7 @@ async function eddieTurn(token){
   if(risk&&count>=3)say('risk');
  }
  await delay(700);if(token!==version)return;
- const choice=E.chooseCategory(dice,state.eddie);state.eddie[choice.id]=choice.value;$('duel').classList.remove('eddie-turn');renderMini(dice);
+ const choice=E.chooseCategory(dice,state.eddie);state.eddie[choice.id]=choice.value;tableSound('stamp');$('duel').classList.remove('eddie-turn');renderMini(dice);
  $('eddie-action').textContent=`${E.categories.find(c=>c.id===choice.id).label}: ${choice.value} pkt · zapisane.`;renderCard();
  if(state.round===13){finish();return;}
  state.round++;state.turn='player';state.rolls=0;state.held=Array(5).fill(false);state.dice=[1,2,3,4,5];$('hint').textContent='Nowa runda. Rzuć wszystkimi pięcioma kośćmi.';mood('idle',0);render();scheduleChatter();
@@ -125,7 +161,7 @@ function finish(){
  $('result-petition').hidden=type!=='lose';
  $('hint').textContent='Pojedynek zakończony. Karta wyników pozostaje do wglądu.';render();$('result').showModal();
 }
-function newGame(){version++;rolling=false;state={player:{},eddie:{},dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),round:1,rolls:0,turn:'player'};if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleChatter();}
+function newGame(){version++;rolling=false;clearThrow();stopTableSound();state={player:{},eddie:{},dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),round:1,rolls:0,turn:'player'};if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleChatter();}
 function updateIntroProgress(){
  const video=$('intro-video');
  const fraction=Number.isFinite(video.duration)&&video.duration>0?Math.min(1,Math.max(0,video.currentTime/video.duration)):0;
@@ -137,7 +173,7 @@ function stopIntro(){
  $('intro-play').hidden=true;$('intro').hidden=true;updateIntroProgress();
  document.querySelector('.app-shell').inert=false;
  try{sessionStorage.setItem('eddie-intro','seen');}catch(_){}
- $('roll').focus({preventScroll:true});
+ $('roll').focus({preventScroll:true});if(state.turn==='player'&&!rolling)say('welcome');scheduleChatter();
 }
 async function playIntro(){
  const run=introRun;$('intro-play').hidden=true;
@@ -145,7 +181,7 @@ async function playIntro(){
  catch(_){if(run===introRun&&!$('intro').hidden){$('intro-play').hidden=false;$('intro-play').focus({preventScroll:true});}}
 }
 function startIntro(){
- clearTimeout(introTimer);introRun++;
+ clearTimeout(introTimer);introRun++;stopTableSound();clearTimeout(chatTimer);
  if($('rules').open)$('rules').close();if($('result').open)$('result').close();
  const video=$('intro-video');video.pause();try{video.currentTime=0;}catch(_){}
  $('intro').hidden=false;$('intro-play').hidden=true;document.querySelector('.app-shell').inert=true;updateIntroProgress();
@@ -157,6 +193,6 @@ $('intro-video').addEventListener('ended',()=>{if(!$('intro').hidden)stopIntro()
 ['timeupdate','durationchange','loadedmetadata','seeking','emptied'].forEach(event=>$('intro-video').addEventListener(event,updateIntroProgress));
 $('roll').onclick=playerRoll;$('new-game').onclick=newGame;$('result-new').onclick=newGame;$('result-close').onclick=()=>$('result').close();
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
-$('sound').onclick=()=>{sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));if(sound)clickSound();};
+$('sound').onclick=()=>{sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));if(sound)tableSound('hold');else stopTableSound();};
 $('skip-intro').onclick=stopIntro;$('replay-intro').onclick=startIntro;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('intro').hidden)stopIntro();});
 newGame();let seen=false;try{seen=sessionStorage.getItem('eddie-intro')==='seen';}catch(_){}if(seen){$('intro').hidden=true;}else startIntro();
