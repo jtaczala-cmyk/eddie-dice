@@ -5,13 +5,14 @@
 <meta name="theme-color" content="#17100d">
 <title>Eddie's Dice of the Beast</title>
 <link rel="stylesheet" href="style.css">
+<script src="tour-nations.js" defer></script><script src="tour.js" defer></script>
 <script src="engine.js" defer></script><script src="game.js" defer></script>
 </head>
 <body>
 <div id="intro" class="intro" aria-label="Filmowe wprowadzenie">
   <video id="intro-video" src="intro/eddie_intro.mp4" playsinline preload="auto" poster="intro/eddie_intro_poster.jpg" aria-label="Wprowadzenie z angielskim lektorem"></video>
   <button id="intro-play" class="primary" hidden>Usiądź przy stole</button>
-  <button id="skip-intro" class="outline">Pomiń intro <span aria-hidden="true">↗</span></button>
+  <button id="skip-intro" class="outline">Pomiń intro i usiądź przy stole <span aria-hidden="true">↗</span></button>
   <div class="intro-progress" aria-hidden="true"></div>
 </div>
 <div class="app-shell">
@@ -19,6 +20,15 @@
   <a class="wordmark" href="#" aria-label="Eddie's Dice of the Beast"><span>EDDIE'S</span><strong>DICE <i>of the</i> BEAST</strong><small>A GAME OF IRON AND CHANCE</small></a>
   <nav aria-label="Opcje gry"><button id="sound" class="icon-button" aria-pressed="false">Dźwięk: wył.</button><button id="rules-open" class="icon-button">Zasady</button><button id="new-game" class="outline">Nowa gra ↻</button></nav>
 </header>
+<section class="tour-parade" aria-label="Kraje i terytoria koncertów Iron Maiden">
+  <div class="tour-intro"><p class="eyebrow">ŚLADAMI KONCERTÓW</p><strong>59 miejsc. Jedna opowieść.</strong><small>Współczesne flagi · historyczne daty</small></div>
+  <div id="tour-card" class="tour-card">
+    <div class="tour-flag-frame"><img id="tour-flag" src="flags/us.svg" alt="Flaga: Stany Zjednoczone" width="84" height="56"></div>
+    <div class="tour-bill"><strong id="tour-country">Stany Zjednoczone</strong><small id="tour-caption">Pierwszy udokumentowany koncert</small><time id="tour-date" datetime="1981-06-03">03.06.1981</time></div>
+    <span id="tour-count" class="tour-count">01 / 59</span>
+  </div>
+  <div class="tour-controls"><div><button id="tour-prev" aria-label="Poprzedni kraj">‹</button><button id="tour-next" aria-label="Następny kraj">›</button></div><button id="tour-pause" aria-pressed="false">Zatrzymaj pochód</button><a id="tour-source" href="https://en.wikipedia.org/wiki/Killer_World_Tour" target="_blank" rel="noopener noreferrer">Źródło daty ↗</a></div>
+</section>
 <main>
   <section class="arena" aria-label="Stół gry">
     <div class="table-top"><div><p class="eyebrow">POJEDYNEK O LOS</p><h1>Stół należy do odważnych.</h1></div><div class="round"><span>RUNDA</span><strong id="round">01 <em>/ 13</em></strong></div></div>
@@ -31,6 +41,7 @@
       <div class="table-edge" aria-hidden="true"></div>
       <div class="table-felt">
         <div class="turn-line"><span id="turn-label" class="turn-pill">TWÓJ RUCH</span><span id="roll-counter">RZUT — / 3</span></div>
+        <p id="roll-line" class="roll-line" aria-hidden="true"></p>
         <div id="dice" class="dice-tray" aria-label="Kości na stole"></div>
         <div class="eddie-hand"><div><span class="eyebrow">EDDIE</span><p id="eddie-action" aria-live="polite">Czeka na twój pierwszy ruch.</p></div><div id="eddie-dice" class="mini-dice" aria-label="Kości Eddiego"></div></div>
       </div>
@@ -47,8 +58,8 @@
     <table><thead><tr><th scope="col">Kategoria</th><th scope="col">Ty</th><th scope="col">Eddie</th></tr></thead><tbody id="upper-rows"></tbody><tbody class="bonus-rows"><tr><th scope="row">Suma górna</th><td id="player-upper">0 / 63</td><td id="eddie-upper">0 / 63</td></tr><tr><th scope="row">Premia <small>≥ 63 → +35</small></th><td id="player-bonus">0</td><td id="eddie-bonus">0</td></tr></tbody><tbody id="lower-rows"></tbody><tfoot><tr><th scope="row">RAZEM</th><td id="player-footer">0</td><td id="eddie-footer">0</td></tr></tfoot></table>
   </section>
 </main>
-<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro">Obejrzyj intro ↗</button><span>5 KOŚCI · 13 RUND · ŻADNEJ LITOŚCI</span></footer>
+<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro" class="outline" title="Osobny film promocyjny — zaproszenie do stołu">Obejrzyj intro ↗</button><span>5 KOŚCI · 13 RUND · ŻADNEJ LITOŚCI</span></footer>
 </div>
-<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu przez 13 rund. Każdy z was raz w rundzie zapisuje wynik w jednej wolnej kategorii.</p><ol><li>Rzuć pięcioma kośćmi. Kliknij kości, aby je zatrzymać lub odblokować.</li><li>Możesz rzucić jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie kliknij kategorię na swojej karcie. Możesz wpisać także zero — decyzji nie da się cofnąć.</li><li>Eddie rozgrywa swoją turę. Po 13 rundach wygrywa wyższy wynik; równy wynik to remis.</li></ol><p><b>Góra:</b> suma wskazanych oczek. Zdobądź 63 punkty w górnej sekcji, a dostaniesz premię 35.</p><p><b>Trójka / kareta:</b> suma wszystkich kości, jeśli masz co najmniej 3 / 4 jednakowe. <b>Full:</b> dokładnie para i trójka, 25 pkt. <b>Mały strit:</b> co najmniej 4 kolejne wartości, 30 pkt. <b>Duży strit:</b> 5 kolejnych wartości, 40 pkt. <b>Generał:</b> 5 jednakowych, 50 pkt. <b>Szansa:</b> suma wszystkich kości.</p><p class="muted">Klasyczny zapis bez dodatkowych premii za kolejne Generały i bez reguły jokera. Podświetlone liczby pokazują bieżące możliwości, nie zapisany wynik. Przycisk „Dźwięk” steruje tylko syntezowanymi stukami kości. Intro ma niezależny, angielski głos lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
+<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu przez 13 rund. Każdy z was raz w rundzie zapisuje wynik w jednej wolnej kategorii.</p><ol><li>Rzuć pięcioma kośćmi. Kliknij kości, aby je zatrzymać lub odblokować.</li><li>Możesz rzucić jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie kliknij kategorię na swojej karcie. Możesz wpisać także zero — decyzji nie da się cofnąć.</li><li>Eddie rozgrywa swoją turę. Po 13 rundach wygrywa wyższy wynik; równy wynik to remis.</li></ol><p><b>Góra:</b> suma wskazanych oczek. Zdobądź 63 punkty w górnej sekcji, a dostaniesz premię 35.</p><p><b>Trójka / kareta:</b> suma wszystkich kości, jeśli masz co najmniej 3 / 4 jednakowe. <b>Full:</b> dokładnie para i trójka, 25 pkt. <b>Mały strit:</b> co najmniej 4 kolejne wartości, 30 pkt. <b>Duży strit:</b> 5 kolejnych wartości, 40 pkt. <b>Generał:</b> 5 jednakowych, 50 pkt. <b>Szansa:</b> suma wszystkich kości.</p><p class="muted">Klasyczny zapis bez dodatkowych premii za kolejne Generały i bez reguły jokera. Podświetlone liczby pokazują bieżące możliwości, nie zapisany wynik. Przycisk „Dźwięk” steruje efektami dźwiękowymi stołu: grzechotem, stukami kości i zapisem wyniku. Intro to osobny film promocyjny z niezależnym, angielskim głosem lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
 <dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><section id="result-petition" hidden><p>Przegrałeś. Podpisz petycję: umieść Eddiego w Madame Tussauds.</p><a class="primary" href="https://www.change.org/p/iron-maiden-eddie-to-wax" target="_blank" rel="noopener noreferrer">Podpisz petycję</a></section><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz kartę</button></dialog>
 </body></html>

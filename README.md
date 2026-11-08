@@ -8,14 +8,14 @@ https://stop60.no/eddie-dice/
 
 ## Uruchomienie
 
-Otwórz `index.html` w aktualnej przeglądarce (Chrome, Firefox, Edge lub Safari), albo wejdź na adres podglądu powyżej. Nie potrzeba serwera deweloperskiego, konta, instalacji, npm ani kompilacji. Zachowaj strukturę plików: `index.html` odwołuje się ścieżkami względnymi do `style.css`, `engine.js`, `game.js`, `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg` oraz do `intro/eddie_intro.mp4` i `intro/eddie_intro_poster.jpg`.
+Otwórz `index.html` w aktualnej przeglądarce (Chrome, Firefox, Edge lub Safari), albo wejdź na adres podglądu powyżej. Nie potrzeba serwera deweloperskiego, konta, instalacji, npm ani kompilacji. Zachowaj strukturę plików: `index.html` odwołuje się ścieżkami względnymi do `style.css`, `engine.js`, `game.js`, `tour.js`, `tour-nations.js`, `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg`, `intro/eddie_intro.mp4`, `intro/eddie_intro_poster.jpg`, `sfx/` oraz `flags/`. W `intro/` są tylko te dwa pliki.
 
-1. Obejrzyj pełnoekranowe intro wideo z angielskim lektorem lub wybierz „Pomiń intro” (także Esc).
+1. Obejrzyj około 28-sekundowe pełnoekranowe intro wideo z angielskim lektorem lub wybierz „Pomiń intro i usiądź przy stole” (także Esc).
 2. „Rzuć kośćmi”, klikaj kości do zatrzymania, rzucaj ponownie (maksymalnie 3 rzuty).
 3. Kliknij wynik w wolnej kategorii w kolumnie „Ty”. Wynik zapisuje się od razu, również jeśli wynosi zero.
 4. Eddie rozgrywa turę. Po 13 rundach porównywane są wyniki wraz z premią górną.
 
-„Zasady” zawierają pełny opis. „Dźwięk” włącza opcjonalne syntetyczne stuki. „Nowa gra” od razu resetuje aktualny pojedynek. Intro odtwarzane jest raz na sesję karty przeglądarki (jeśli sessionStorage jest dostępny); można je ponownie otworzyć ze stopki przyciskiem „Obejrzyj intro”.
+„Zasady” zawierają pełny opis. „Dźwięk” włącza opcjonalne dźwięki stołu z `sfx/` (grzechot, stuki, lądowanie, zatrzymanie, pieczęć). „Nowa gra” od razu resetuje aktualny pojedynek. Intro odtwarzane jest raz na sesję karty przeglądarki (jeśli sessionStorage jest dostępny); można je ponownie otworzyć ze stopki przyciskiem „Obejrzyj intro”. Nad stołem idzie pochód 59 flag krajów koncertowych z datami pierwszych koncertów.
 
 Intro ma własny dźwięk niezależny od stuków kości. Gdy przeglądarka blokuje automatyczne odtwarzanie z głosem, kliknij „Usiądź przy stole”. Przy ograniczeniu ruchu obraz pozostaje nieruchomy przez 4 sekundy. Pasek postępu śledzi wideo.
 
@@ -34,7 +34,7 @@ Po przegranej ekran wyniku pokazuje „Podpisz petycję” — link do https://w
 
 ## Materiały i prawa
 
-Gra używa `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg` (wycinek górnej części dostarczonego plakatu) oraz pełnoekranowego intra `intro/eddie_intro.mp4` z plakatem `intro/eddie_intro_poster.jpg`. Nie wyświetla dolnego logotypu ani hasła zespołu. Nie użyto żadnych tekstów piosenek. Prototyp jest opisany jako nieoficjalny projekt fanowski i nie deklaruje licencji ani afiliacji.
+Gra używa `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg` (wycinek górnej części dostarczonego plakatu), pełnoekranowego intra `intro/eddie_intro.mp4` z plakatem `intro/eddie_intro_poster.jpg` oraz oryginalnych plików SVG w `flags/`. Nie wyświetla dolnego logotypu ani hasła zespołu. Nie użyto żadnych tekstów piosenek. Prototyp jest opisany jako nieoficjalny projekt fanowski i nie deklaruje licencji ani afiliacji.
 
 Przykładowe autorskie wypowiedzi:
 
@@ -48,4 +48,4 @@ Przykładowe autorskie wypowiedzi:
 
 Podczas przygotowania prototypu sprawdzono 101 asercji zasad (wszystkie 7776 wyników pięciu kości × 13 kategorii oraz przypadki brzegowe), premię górną i strategię. Osobna kontrola interfejsu objęła blokadę autoplay i przycisk odtwarzania z głosem, postęp i koniec wideo, powtórkę, Esc, ograniczenie ruchu, petycję tylko po przegranej (nie po wygranej ani remisie), pomijanie intro, zatrzymywanie kości, limit rzutów, blokowanie kategorii, restart w trakcie tury AI i pełny mecz 13 rund. Granie w przeglądarce nie wymaga Node ani jsdom.
 
-Brak znanych błędów w przetestowanych zasadach i przepływie. Układ nie był jeszcze sprawdzany na fizycznym telefonie. Nie ma zapisu meczu po odświeżeniu, wyboru trudności ani sieciowego multiplayera. Opcjonalny dźwięk zależy od obsługi Web Audio.
+Brak znanych błędów w przetestowanych zasadach i przepływie. Układ nie był jeszcze sprawdzany na fizycznym telefonie. Nie ma zapisu meczu po odświeżeniu, wyboru trudności ani sieciowego multiplayera. Opcjonalny dźwięk stołu odtwarza pliki z `sfx/`, a gdy przeglądarka ich nie puści, używa krótkiego dźwięku Web Audio.
