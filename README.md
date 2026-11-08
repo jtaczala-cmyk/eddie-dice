@@ -6,16 +6,20 @@ Po scaleniu tej zmiany GitHub Pages (gałąź `main`, katalog `/`, bez pliku CNA
 
 https://stop60.no/eddie-dice/
 
-## Jak grać w przeglądarce
+## Uruchomienie
 
-Otwórz `index.html` w aktualnej przeglądarce (Chrome, Firefox, Edge lub Safari), albo wejdź na adres podglądu powyżej. Nie potrzeba serwera deweloperskiego, konta, instalacji, npm ani kompilacji. Gra działa lokalnie i offline: wszystkie pliki gry i obrazy muszą pozostać w tym samym folderze, bo `index.html` odwołuje się do nich ścieżkami względnymi (`style.css`, `engine.js`, `game.js`, `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg`).
+Otwórz `index.html` w aktualnej przeglądarce (Chrome, Firefox, Edge lub Safari), albo wejdź na adres podglądu powyżej. Nie potrzeba serwera deweloperskiego, konta, instalacji, npm ani kompilacji. Zachowaj strukturę plików: `index.html` odwołuje się ścieżkami względnymi do `style.css`, `engine.js`, `game.js`, `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg` oraz do `intro/eddie_intro.mp4` i `intro/eddie_intro_poster.jpg`.
 
-1. Obejrzyj 28-sekundowe intro lub wybierz „Pomiń intro” (także Esc).
+1. Obejrzyj pełnoekranowe intro wideo z angielskim lektorem lub wybierz „Pomiń intro” (także Esc).
 2. „Rzuć kośćmi”, klikaj kości do zatrzymania, rzucaj ponownie (maksymalnie 3 rzuty).
 3. Kliknij wynik w wolnej kategorii w kolumnie „Ty”. Wynik zapisuje się od razu, również jeśli wynosi zero.
 4. Eddie rozgrywa turę. Po 13 rundach porównywane są wyniki wraz z premią górną.
 
-„Zasady” zawierają pełny opis. „Dźwięk” włącza opcjonalne syntetyczne stuki. „Nowa gra” od razu resetuje aktualny pojedynek. Intro odtwarzane jest raz na sesję karty przeglądarki (jeśli sessionStorage jest dostępny); można je ponownie otworzyć ze stopki.
+„Zasady” zawierają pełny opis. „Dźwięk” włącza opcjonalne syntetyczne stuki. „Nowa gra” od razu resetuje aktualny pojedynek. Intro odtwarzane jest raz na sesję karty przeglądarki (jeśli sessionStorage jest dostępny); można je ponownie otworzyć ze stopki przyciskiem „Obejrzyj intro”.
+
+Intro ma własny dźwięk niezależny od stuków kości. Gdy przeglądarka blokuje automatyczne odtwarzanie z głosem, kliknij „Usiądź przy stole”. Przy ograniczeniu ruchu obraz pozostaje nieruchomy przez 4 sekundy. Pasek postępu śledzi wideo.
+
+Po przegranej ekran wyniku pokazuje „Podpisz petycję” — link do https://www.change.org/p/iron-maiden-eddie-to-wax otwierany wyłącznie po kliknięciu, w nowej karcie. Przy wygranej i remisie jest ukryty. Sama gra działa offline; otwarcie petycji wymaga internetu.
 
 ## Implementacja
 
@@ -26,11 +30,11 @@ Otwórz `index.html` w aktualnej przeglądarce (Chrome, Firefox, Edge lub Safari
 - Animacje Eddiego: oddech i kołysanie (stale), mówienie, rzut, namysł, zadowolenie i lekceważenie; przy prefers-reduced-motion pozostaje statyczny, a dymek nadal się zmienia.
 - Oryginalne sentencje (nie teksty piosenek): ok. 40% wypowiedzi po PT/ES/PL/JA/DE/FR, reszta po angielsku. Gdy gracz się zastanawia, Eddie zagaduje co 12–18 s. To dymki tekstowe, nie nagrania ani synteza mowy.
 - Animowane kości, reakcja portretu, responsywny układ i ograniczenie animacji przy prefers-reduced-motion. Intro trwa wtedy 4 sekundy.
-- Brak zewnętrznych fontów, analityki, kont i backendu.
+- Wszystko działa lokalnie i offline. Brak zewnętrznych fontów, analityki, kont i backendu.
 
 ## Materiały i prawa
 
-Gra używa `Eddie_Dice_Scene.jpg` oraz `Eddie_Portrait_Crop.jpg` (wycinek górnej części dostarczonego plakatu). Nie wyświetla dolnego logotypu ani hasła zespołu. Nie użyto żadnych tekstów piosenek ani nagrań muzycznych. Prototyp jest opisany jako nieoficjalny projekt fanowski i nie deklaruje licencji ani afiliacji.
+Gra używa `Eddie_Dice_Scene.jpg`, `Eddie_Portrait_Crop.jpg` (wycinek górnej części dostarczonego plakatu) oraz pełnoekranowego intra `intro/eddie_intro.mp4` z plakatem `intro/eddie_intro_poster.jpg`. Nie wyświetla dolnego logotypu ani hasła zespołu. Nie użyto żadnych tekstów piosenek. Prototyp jest opisany jako nieoficjalny projekt fanowski i nie deklaruje licencji ani afiliacji.
 
 Przykładowe autorskie wypowiedzi:
 
@@ -42,6 +46,6 @@ Przykładowe autorskie wypowiedzi:
 
 ## Weryfikacja i ograniczenia
 
-Podczas przygotowania prototypu sprawdzono 101 asercji zasad (wszystkie 7776 wyników pięciu kości × 13 kategorii oraz przypadki brzegowe), premię górną i strategię. Osobna kontrola interfejsu objęła pomijanie intro, zatrzymywanie kości, limit rzutów, blokowanie kategorii, restart w trakcie tury AI i pełny mecz 13 rund. Granie w przeglądarce nie wymaga Node ani jsdom.
+Podczas przygotowania prototypu sprawdzono 101 asercji zasad (wszystkie 7776 wyników pięciu kości × 13 kategorii oraz przypadki brzegowe), premię górną i strategię. Osobna kontrola interfejsu objęła blokadę autoplay i przycisk odtwarzania z głosem, postęp i koniec wideo, powtórkę, Esc, ograniczenie ruchu, petycję tylko po przegranej (nie po wygranej ani remisie), pomijanie intro, zatrzymywanie kości, limit rzutów, blokowanie kategorii, restart w trakcie tury AI i pełny mecz 13 rund. Granie w przeglądarce nie wymaga Node ani jsdom.
 
-Brak znanych błędów w przetestowanych zasadach i przepływie. Układ nie był jeszcze sprawdzany na fizycznym telefonie. Nie ma zapisu meczu po odświeżeniu, wyboru trudności, dubbingu ani sieciowego multiplayera. Opcjonalny dźwięk zależy od obsługi Web Audio.
+Brak znanych błędów w przetestowanych zasadach i przepływie. Układ nie był jeszcze sprawdzany na fizycznym telefonie. Nie ma zapisu meczu po odświeżeniu, wyboru trudności ani sieciowego multiplayera. Opcjonalny dźwięk zależy od obsługi Web Audio.
