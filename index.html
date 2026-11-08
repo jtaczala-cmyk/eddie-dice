@@ -9,12 +9,10 @@
 </head>
 <body>
 <div id="intro" class="intro" aria-label="Filmowe wprowadzenie">
-  <img class="intro-scene" src="Eddie_Dice_Scene.jpg" alt="Eddie w cylindrze przy drewnianym stole z pięcioma kośćmi">
-  <img class="intro-portrait" src="Eddie_Portrait_Crop.jpg" alt="Eddie wskazuje na ciebie">
-  <div class="intro-shade"></div>
-  <div class="intro-copy"><p id="intro-kicker">THE TABLE HAS BEEN WAITING.</p><h1 id="intro-title">Five bones.<br>One invitation.</h1><p id="intro-sub">“Pull up a chair. Let your courage do the counting.”</p></div>
+  <video id="intro-video" src="intro/eddie_intro.mp4" playsinline preload="auto" poster="intro/eddie_intro_poster.jpg" aria-label="Wprowadzenie z angielskim lektorem"></video>
+  <button id="intro-play" class="primary" hidden>Usiądź przy stole</button>
   <button id="skip-intro" class="outline">Pomiń intro <span aria-hidden="true">↗</span></button>
-  <div class="intro-progress"></div>
+  <div class="intro-progress" aria-hidden="true"></div>
 </div>
 <div class="app-shell">
 <header class="masthead">
@@ -51,6 +49,6 @@
 </main>
 <footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro">Obejrzyj intro ↗</button><span>5 KOŚCI · 13 RUND · ŻADNEJ LITOŚCI</span></footer>
 </div>
-<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu przez 13 rund. Każdy z was raz w rundzie zapisuje wynik w jednej wolnej kategorii.</p><ol><li>Rzuć pięcioma kośćmi. Kliknij kości, aby je zatrzymać lub odblokować.</li><li>Możesz rzucić jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie kliknij kategorię na swojej karcie. Możesz wpisać także zero — decyzji nie da się cofnąć.</li><li>Eddie rozgrywa swoją turę. Po 13 rundach wygrywa wyższy wynik; równy wynik to remis.</li></ol><p><b>Góra:</b> suma wskazanych oczek. Zdobądź 63 punkty w górnej sekcji, a dostaniesz premię 35.</p><p><b>Trójka / kareta:</b> suma wszystkich kości, jeśli masz co najmniej 3 / 4 jednakowe. <b>Full:</b> dokładnie para i trójka, 25 pkt. <b>Mały strit:</b> co najmniej 4 kolejne wartości, 30 pkt. <b>Duży strit:</b> 5 kolejnych wartości, 40 pkt. <b>Generał:</b> 5 jednakowych, 50 pkt. <b>Szansa:</b> suma wszystkich kości.</p><p class="muted">Klasyczny zapis bez dodatkowych premii za kolejne Generały i bez reguły jokera. Podświetlone liczby pokazują bieżące możliwości, nie zapisany wynik. Dźwięki są syntezowane lokalnie, bez muzyki.</p><button class="primary close-dialog">Do stołu</button></dialog>
-<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz kartę</button></dialog>
+<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu przez 13 rund. Każdy z was raz w rundzie zapisuje wynik w jednej wolnej kategorii.</p><ol><li>Rzuć pięcioma kośćmi. Kliknij kości, aby je zatrzymać lub odblokować.</li><li>Możesz rzucić jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie kliknij kategorię na swojej karcie. Możesz wpisać także zero — decyzji nie da się cofnąć.</li><li>Eddie rozgrywa swoją turę. Po 13 rundach wygrywa wyższy wynik; równy wynik to remis.</li></ol><p><b>Góra:</b> suma wskazanych oczek. Zdobądź 63 punkty w górnej sekcji, a dostaniesz premię 35.</p><p><b>Trójka / kareta:</b> suma wszystkich kości, jeśli masz co najmniej 3 / 4 jednakowe. <b>Full:</b> dokładnie para i trójka, 25 pkt. <b>Mały strit:</b> co najmniej 4 kolejne wartości, 30 pkt. <b>Duży strit:</b> 5 kolejnych wartości, 40 pkt. <b>Generał:</b> 5 jednakowych, 50 pkt. <b>Szansa:</b> suma wszystkich kości.</p><p class="muted">Klasyczny zapis bez dodatkowych premii za kolejne Generały i bez reguły jokera. Podświetlone liczby pokazują bieżące możliwości, nie zapisany wynik. Przycisk „Dźwięk” steruje tylko syntezowanymi stukami kości. Intro ma niezależny, angielski głos lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
+<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><section id="result-petition" hidden><p>Przegrałeś. Podpisz petycję: umieść Eddiego w Madame Tussauds.</p><a class="primary" href="https://www.change.org/p/iron-maiden-eddie-to-wax" target="_blank" rel="noopener noreferrer">Podpisz petycję</a></section><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz kartę</button></dialog>
 </body></html>

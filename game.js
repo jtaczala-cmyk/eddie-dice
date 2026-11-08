@@ -1,6 +1,6 @@
 'use strict';
 const E=DiceEngine, $=id=>document.getElementById(id);
-let state,version=0,sound=false,audio,rolling=false,introTimers=[];
+let state,version=0,sound=false,audio,rolling=false,introTimer,introRun=0;
 const pips={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const lines={
  welcome:['The chair is yours. The odds are not.','Five little bones. Let us see what they remember.'],
@@ -122,19 +122,39 @@ function finish(){
  clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');state.turn='finished';const p=E.totals(state.player).total,e=E.totals(state.eddie).total;const type=p>e?'win':p<e?'lose':'draw';const spoken=say(type);
  $('result-title').textContent=p>e?'Los uchylił ci kapelusza.':p<e?'Eddie zgarnia stawkę.':'Noc bez zwycięzcy.';$('result-quote').textContent='“'+spoken.text+'”';$('result-quote').lang=spoken.lang;
  $('result-totals').innerHTML=`<div><small>TY</small>${p}</div><span>:</span><div><small>EDDIE</small>${e}</div>`;
+ $('result-petition').hidden=type!=='lose';
  $('hint').textContent='Pojedynek zakończony. Karta wyników pozostaje do wglądu.';render();$('result').showModal();
 }
 function newGame(){version++;rolling=false;state={player:{},eddie:{},dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),round:1,rolls:0,turn:'player'};if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleChatter();}
-function stopIntro(){introTimers.forEach(clearTimeout);introTimers=[];$('intro').hidden=true;document.querySelector('.app-shell').inert=false;try{sessionStorage.setItem('eddie-intro','seen');}catch(_){}$('roll').focus({preventScroll:true});}
-function startIntro(){
- introTimers.forEach(clearTimeout);introTimers=[];if($('rules').open)$('rules').close();if($('result').open)$('result').close();
- $('intro').hidden=false;$('intro').className='intro';document.querySelector('.app-shell').inert=true;
- const stages=[['THE TABLE HAS BEEN WAITING.','Five bones.<br>One invitation.','“Pull up a chair. Let your courage do the counting.”'],['HE HAS SAVED YOU A SEAT.','A gentleman.<br>A terrible wager.','“I brought the hat. You bring the nerve.”'],['THIRTEEN ROUNDS. NO HIDING PLACE.','Hold your nerve.<br>Roll your fate.','“Every choice leaves a mark on this table.”'],['A GAME OF IRON AND CHANCE',"EDDIE’S DICE<br>OF THE BEAST",'Your turn to face the table.']];
- const show=i=>{$('intro').className='intro phase-'+i;$('intro-kicker').textContent=stages[i][0];$('intro-title').innerHTML=stages[i][1];$('intro-sub').textContent=stages[i][2];};show(0);
- const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(reduced){introTimers.push(setTimeout(stopIntro,4000));}else{[1,2,3].forEach(i=>introTimers.push(setTimeout(()=>show(i),i*7000)));introTimers.push(setTimeout(stopIntro,28000));}
- $('skip-intro').focus({preventScroll:true});
+function updateIntroProgress(){
+ const video=$('intro-video');
+ const fraction=Number.isFinite(video.duration)&&video.duration>0?Math.min(1,Math.max(0,video.currentTime/video.duration)):0;
+ document.querySelector('.intro-progress').style.width=(fraction*100)+'%';
 }
+function stopIntro(){
+ clearTimeout(introTimer);introRun++;
+ const video=$('intro-video');video.pause();try{video.currentTime=0;}catch(_){}
+ $('intro-play').hidden=true;$('intro').hidden=true;updateIntroProgress();
+ document.querySelector('.app-shell').inert=false;
+ try{sessionStorage.setItem('eddie-intro','seen');}catch(_){}
+ $('roll').focus({preventScroll:true});
+}
+async function playIntro(){
+ const run=introRun;$('intro-play').hidden=true;
+ try{await $('intro-video').play();}
+ catch(_){if(run===introRun&&!$('intro').hidden){$('intro-play').hidden=false;$('intro-play').focus({preventScroll:true});}}
+}
+function startIntro(){
+ clearTimeout(introTimer);introRun++;
+ if($('rules').open)$('rules').close();if($('result').open)$('result').close();
+ const video=$('intro-video');video.pause();try{video.currentTime=0;}catch(_){}
+ $('intro').hidden=false;$('intro-play').hidden=true;document.querySelector('.app-shell').inert=true;updateIntroProgress();
+ $('skip-intro').focus({preventScroll:true});
+ if(reduced()){introTimer=setTimeout(stopIntro,4000);}else playIntro();
+}
+$('intro-play').onclick=()=>{if(!$('intro').hidden&&!reduced())playIntro();};
+$('intro-video').addEventListener('ended',()=>{if(!$('intro').hidden)stopIntro();});
+['timeupdate','durationchange','loadedmetadata','seeking','emptied'].forEach(event=>$('intro-video').addEventListener(event,updateIntroProgress));
 $('roll').onclick=playerRoll;$('new-game').onclick=newGame;$('result-new').onclick=newGame;$('result-close').onclick=()=>$('result').close();
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
 $('sound').onclick=()=>{sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));if(sound)clickSound();};
