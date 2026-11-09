@@ -90,3 +90,59 @@
 @media(max-width:720px){.tour-parade{grid-template-columns:minmax(0,1fr) auto;gap:12px}.tour-intro{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:14px;row-gap:5px}.tour-intro .eyebrow{margin:0}.tour-intro small{margin:0}.tour-card{padding-left:0;border-left:0;gap:13px;min-height:94px}.tour-bill strong{font-size:15px}.tour-flag-frame{width:70px;height:56px;padding:5px}.tour-bill time{font-size:18px;letter-spacing:.06em}.tour-count{top:-10px;right:2px}.tour-controls button{font-size:9px;padding-inline:6px}.tour-controls a{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.bill-arrives .tour-bill strong,.bill-arrives .tour-bill time span{animation:none!important;opacity:1;transform:none;filter:none}}
 @media(max-width:420px){.tour-parade{grid-template-columns:minmax(0,1fr)}.tour-intro{grid-column:auto}.tour-controls{flex-direction:row;justify-content:space-between;flex-wrap:wrap}.tour-count{display:block}.tour-bill time{font-size:19px}}
+
+/* Pub table: walnut rail, candlelit felt, dice poured from a hand. */
+.seat{background:radial-gradient(ellipse 48% 62% at 50% 64%,#6a452866,transparent 70%),linear-gradient(#14100dcc,#100c0af2),url('Eddie_Dice_Scene.jpg') center 18%/cover}
+.table-board{position:relative;margin:0 8px 10px;padding:11px 12px 12px;border-radius:18px;border:1px solid #b08a52;background:repeating-linear-gradient(95deg,transparent 0 2px,#00000024 2px 3px),repeating-linear-gradient(#8d5e36 0 4px,#5b3a22 5px,#7a4e2e 8px,#3c2416 13px,#694328 17px,#2c1a10 24px);box-shadow:0 20px 34px #000a,inset 0 1px 0 #f3d7aa88,inset 0 -14px 20px #0008}
+.duel .table-edge{height:12px;margin:0 2px 8px;border-radius:7px;background:linear-gradient(#f0d7a8,#a8743e 38%,#4a2c18);box-shadow:inset 0 1px 0 #fff8,0 4px 8px #0006;border-top:0}
+.duel .table-felt{margin:0;border-radius:12px;padding:14px 16px 12px;background:#143228;background-image:radial-gradient(ellipse at 50% 38%,#ffffff1c,transparent 46%),radial-gradient(ellipse at 18% 0%,#ffb45a33,transparent 34%),radial-gradient(ellipse at 82% 0%,#ff9d4a26,transparent 32%),radial-gradient(ellipse at 50% 46%,#3d7a5c 0%,#1c4a38 48%,#0e2c22 100%),repeating-linear-gradient(#ffffff14 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#0000001f 0 1px,transparent 1px 4px);box-shadow:inset 0 0 0 1px #efd7a640,inset 0 18px 28px #0006,inset 0 -16px 22px #00000055;transition:box-shadow .3s}
+.duel .dice-tray{position:relative;padding:74px 0 16px;perspective:none}
+.duel .dice-tray:before{content:'';position:absolute;left:8%;right:8%;top:34%;bottom:6%;border-radius:50%;background:radial-gradient(ellipse,#fff3 0%,transparent 68%);pointer-events:none}
+.duel .turn-line{color:#f3e6cc;position:relative;z-index:1}
+.duel .turn-pill{background:#07140fcc;color:#f4ddb0;border-color:#efd7a655}
+.duel .eddie-hand{position:relative;z-index:1;margin-top:4px}
+.duel .eddie-hand p{color:#f6ecda}
+.duel .eddie-hand .eyebrow{color:#f0d7a4}
+.near-side{background:transparent;border-top:1px solid #efd7a633;margin-top:8px;padding:14px 8px 6px;border-radius:0}
+.near-side .hint{color:#f8ecd8;text-shadow:0 1px 2px #0008}
+.duel.in-flight .table-felt{box-shadow:inset 0 0 36px #ffb45a2a,inset 0 0 0 1px #f0d7a466,inset 0 18px 28px #0006}
+.duel.pour-player .near-side{box-shadow:inset 0 10px 18px #0004}
+
+.die{padding:0;display:block;border:0;background:transparent;box-shadow:none;overflow:visible;transition:none;transform:rotate(var(--tilt,0deg));transform-origin:50% 50%}
+.die:hover:not(:disabled){filter:none}
+.duel .die:disabled{opacity:1}
+.die:before{content:'';position:absolute;left:14%;right:14%;bottom:-12%;height:22%;background:#0007;border-radius:50%;filter:blur(3px);z-index:-1;pointer-events:none}
+.die-space{position:absolute;inset:0;perspective:680px}
+.die .cube{position:absolute;inset:0;transform-style:preserve-3d}
+.die .side{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:13%;gap:2px;box-sizing:border-box;background:radial-gradient(circle at 30% 24%,#f8efd8,#e4cfa6 46%,#c6a46e);border:1px solid #9a743f;border-radius:8px;box-shadow:inset 0 2px 3px #fff9,inset -3px -4px 6px #6a4a2855;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.die .face-1{transform:rotateY(0deg) translateZ(var(--half,32px))}
+.die .face-6{transform:rotateY(180deg) translateZ(var(--half,32px))}
+.die .face-2{transform:rotateY(90deg) translateZ(var(--half,32px))}
+.die .face-5{transform:rotateY(-90deg) translateZ(var(--half,32px))}
+.die .face-3{transform:rotateX(90deg) translateZ(var(--half,32px))}
+.die .face-4{transform:rotateX(-90deg) translateZ(var(--half,32px))}
+.die .pip{max-width:none;max-height:none;background:radial-gradient(circle at 35% 30%,#4a3424,#140e0a 72%);box-shadow:inset 0 1px 1px #000a,0 .5px 0 #fff4}
+.die.pouring{z-index:4}
+.die.held{background:transparent}
+
+.pour-hands{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.hand{position:absolute;top:0;left:0;opacity:0;pointer-events:none;filter:drop-shadow(0 10px 8px #0008)}
+.hand-svg{display:block;width:100%;height:auto;overflow:visible}
+.eddie-fist{width:min(300px,72%)}
+.player-hand{width:min(360px,96%)}
+.pose{opacity:0}
+.avatar[data-mood=watching]{animation:watchIt 1.15s ease}
+@keyframes watchIt{35%{transform:translateY(8px) scale(1.015)}70%{transform:translateY(3px)}}
+.avatar[data-mood=reaching]{animation:reachIt 1.2s cubic-bezier(.2,.7,.2,1)}
+@keyframes reachIt{0%{transform:none}30%{transform:translateY(16px) scale(1.035)}68%{transform:translateY(8px) scale(1.02)}100%{transform:none}}
+@media(max-width:720px){
+  .table-board{margin:0 0 8px;padding:8px}
+  .eddie-fist{width:min(230px,72vw)}
+  .player-hand{width:min(300px,94vw)}
+  .duel .dice-tray{padding-top:68px}
+  .duel .table-felt{padding:12px 10px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hand,.pose{animation:none!important;opacity:0!important}
+  .avatar[data-mood=watching],.avatar[data-mood=reaching]{animation:none!important}
+}

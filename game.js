@@ -64,22 +64,40 @@ function tableSound(kind){
  voice.onended=()=>activeSfx.delete(voice);voice.onerror=fail;
  try{const playing=voice.play();if(playing)playing.catch(fail);}catch(_){fail();}
 }
+function cancelAnims(el){if(!el||!el.getAnimations)return;el.getAnimations().forEach(a=>{try{a.cancel();}catch(_){}});}
 function clearThrow(){
- $('roll-line').classList.remove('visible');$('duel').classList.remove('in-flight','impact','gold-hand');
+ $('roll-line').classList.remove('visible');$('duel').classList.remove('in-flight','impact','gold-hand','pour-eddie','pour-player');
+ pourTimers.splice(0).forEach(clearTimeout);
+ for(const id of ['eddie-fist','player-hand']){const h=$(id);if(!h)continue;cancelAnims(h);h.querySelectorAll('*').forEach(cancelAnims);}
+ for(const el of $('dice').children){cancelAnims(el);cancelAnims(el.querySelector('.cube'));el.classList.remove('pouring','landed','rolling');el.style.zIndex='';}
 }
-function startThrow(){
- clearThrow();const spoken=say('rolling','throwing');$('roll-line').textContent='“'+spoken.text+'”';$('roll-line').lang=spoken.lang;
- $('roll-line').classList.add('visible');$('duel').classList.add('in-flight');tableSound('rattle');
+function startThrow(who){
+ clearThrow();const spoken=say('rolling',who==='eddie'?'reaching':'watching');$('roll-line').textContent='“'+spoken.text+'”';$('roll-line').lang=spoken.lang;
+ $('roll-line').classList.add('visible');$('duel').classList.add('in-flight',who==='eddie'?'pour-eddie':'pour-player');tableSound('rattle');
 }
-function landThrow(dice,held=state.held){
- $('roll-line').classList.remove('visible');$('duel').classList.remove('in-flight');
+function landThrow(dice){
+ $('roll-line').classList.remove('visible');$('duel').classList.remove('in-flight','pour-eddie','pour-player');
  $('duel').classList.add('impact');if(['great','beast'].includes(classify(dice)))$('duel').classList.add('gold-hand');
- [...$('dice').children].forEach((b,i)=>{if(!held[i]){b.style.setProperty('--die-delay',i*22+'ms');b.classList.add('landed');}});
 }
+function later(fn,ms){const id=setTimeout(fn,ms);pourTimers.push(id);}
+function motion(x,y,r,s,o){return {transform:`translate(${x.toFixed(2)}px,${y.toFixed(2)}px) rotate(${r.toFixed(2)}deg) scale(${s})`,opacity:o};}
 function dieContents(value){return Array.from({length:9},(_,i)=>pips[value].includes(i)?'<span class="pip" aria-hidden="true"></span>':'<span></span>').join('');}
+// Cube rotations that bring each value's face to the camera. Opposites sum to 7.
+const FACE_ROT={1:[0,0],2:[0,-90],3:[-90,0],4:[90,0],5:[0,90],6:[0,180]};
+const TILT=[-5,3,-2,5,-3];
+const POUR_MS=1280;
+let pourTimers=[];
+function faceTransform(v){const [x,y]=FACE_ROT[v]||FACE_ROT[1];return `rotateX(${x}deg) rotateY(${y}deg)`;}
+function dieCube(value){
+ const faces=[[1,'face-1'],[6,'face-6'],[2,'face-2'],[5,'face-5'],[3,'face-3'],[4,'face-4']];
+ const sides=faces.map(([v,cls])=>`<span class="side ${cls}" data-value="${v}">${dieContents(v)}</span>`).join('');
+ return `<span class="die-space"><span class="cube" style="transform:${faceTransform(value)}">${sides}</span></span>`;
+}
+function sizeDice(){for(const b of $('dice').children){const w=b.offsetWidth;if(w)b.style.setProperty('--half',(w/2)+'px');}}
 function renderDice() {
  const tray=$('dice');tray.replaceChildren();
- state.dice.forEach((v,i)=>{const b=document.createElement('button');b.className='die'+(state.held[i]?' held':'');b.style.setProperty('--tilt',[-5,3,-2,5,-3][i]+'deg');b.innerHTML=dieContents(v);b.disabled=state.turn!=='player'||state.rolls===0||rolling||state.rolls>=3;b.setAttribute('aria-label',`Kość ${i+1}: ${state.rolls?v:'jeszcze nie rzucona'}${state.held[i]?', zatrzymana':''}`);b.setAttribute('aria-pressed',String(state.held[i]));b.onclick=()=>{state.held[i]=!state.held[i];tableSound('hold');renderDice();$('dice').children[i].focus({preventScroll:true});};tray.append(b);});
+ state.dice.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='die'+(state.held[i]?' held':'');b.style.setProperty('--tilt',TILT[i]+'deg');b.innerHTML=dieCube(v);b.disabled=state.turn!=='player'||state.rolls===0||rolling||state.rolls>=3;b.setAttribute('aria-label',`Kość ${i+1}: ${state.rolls?v:'jeszcze nie rzucona'}${state.held[i]?', zatrzymana':''}`);b.setAttribute('aria-pressed',String(state.held[i]));b.onclick=()=>{state.held[i]=!state.held[i];tableSound('hold');renderDice();$('dice').children[i].focus({preventScroll:true});};tray.append(b);});
+ sizeDice();
 }
 function renderMini(dice=state.eddieDice,held=[]) {
  $('eddie-dice').innerHTML=dice.map((v,i)=>`<span class="mini-die${held[i]?' kept':''}" aria-label="${v}">${['','⚀','⚁','⚂','⚃','⚄','⚅'][v]}</span>`).join('');
@@ -113,31 +131,87 @@ const randomDie=()=>1+Math.floor(Math.random()*6);
 function classify(dice){if(E.score('yahtzee',dice))return 'beast';if(E.score('large',dice)||E.score('full',dice)||E.score('four',dice))return 'great';if(dice.reduce((a,b)=>a+b,0)<=13)return 'bad';return 'normal';}
 async function playerRoll(){
  if(state.turn!=='player'||state.rolls>=3||rolling)return;
- clearTimeout(chatTimer);const token=version;rolling=true;render();
- await tumble(token,state.held);if(token!==version)return;
- state.dice=state.dice.map((v,i)=>state.held[i]?v:randomDie());state.rolls++;rolling=false;
+ clearTimeout(chatTimer);const token=version;rolling=true;const held=state.held.slice();
+ const next=state.dice.map((v,i)=>held[i]?v:randomDie());render();
+ try{await pour(token,{who:'player',held,finals:next});}catch(_){}if(token!==version)return;
+ state.dice=next;state.rolls++;rolling=false;
  say(classify(state.dice));scheduleChatter();$('hint').textContent=state.rolls<3?'Kliknij kości, aby je zatrzymać, albo wybierz kategorię na karcie.':'To ostatni rzut. Wybierz jedną wolną kategorię na karcie.';render();landThrow(state.dice);
 }
 async function assign(id){
  if(state.turn!=='player'||!state.rolls||rolling||state.player[id]!==undefined)return;
  clearTimeout(chatTimer);tableSound('stamp');state.player[id]=E.score(id,state.dice);state.turn='eddie';$('hint').textContent='Twój wynik został zapisany. Teraz kości przejmuje Eddie.';render();await eddieTurn(version);
 }
-async function tumble(token,held){
- startThrow();const bs=[...$('dice').children],loose=bs.map((_,i)=>i).filter(i=>!held[i]);
- bs.forEach((b,i)=>{if(!held[i]){b.style.setProperty('--die-delay',i*31+'ms');b.classList.add('rolling');}});
- for(let k=0;k<16;k++){
-  await delay(65);if(token!==version)return;
-  if(k>=2&&k<2+loose.length)tableSound('clack-'+(1+Math.floor(Math.random()*3)));
-  if(k===13&&loose.length)tableSound('landing');
-  bs.forEach((b,i)=>{if(!held[i])b.innerHTML=dieContents(randomDie());});
- }
+// Pour loose dice out of a hand. The cube's rest rotation is the real rolled face.
+async function pour(token,{who,held,finals}){
+ if(reduced())return;
+ const buttons=[...$('dice').children];
+ const loose=buttons.map((el,i)=>({el,i})).filter(d=>!held[d.i]);
+ startThrow(who);if(token!==version)return;
+ const hand=$(who==='eddie'?'eddie-fist':'player-hand');
+ const svg=hand.querySelector('svg');
+ const tray=$('dice').getBoundingClientRect();
+ const root=$('pour-hands').getBoundingClientRect();
+ if(hand.offsetWidth<20||tray.width<20)return;
+ const releaseV=who==='eddie'
+  ?{x:tray.left+tray.width/2,y:tray.top+Math.max(28,tray.height*0.22)}
+  :{x:tray.left+tray.width/2,y:tray.bottom+28};
+ const px=parseFloat(svg.dataset.palmX)||.5,py=parseFloat(svg.dataset.palmY)||.5;
+ hand.style.left=(releaseV.x-root.left-hand.offsetWidth*px)+'px';
+ hand.style.top=(releaseV.y-root.top-hand.offsetHeight*py)+'px';
+ const felt=document.querySelector('.table-felt').getBoundingClientRect(),duel=$('duel').getBoundingClientRect();
+ const entryY=who==='eddie'?Math.min(-80,(felt.top-24)-releaseV.y):Math.max(110,(duel.bottom+16)-releaseV.y);
+ const exitY=who==='eddie'?entryY-24:entryY+28;
+ const T=POUR_MS,pending=[];
+ pending.push(hand.animate([
+  {transform:`translate(0px,${entryY}px) rotate(${who==='eddie'?-8:7}deg)`,opacity:0,offset:0},
+  {transform:`translate(0px,${entryY*.35}px) rotate(${who==='eddie'?-3:3}deg)`,opacity:1,offset:.14},
+  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.24},
+  {transform:`translate(0px,${who==='eddie'?10:-8}px) rotate(${who==='eddie'?4:-5}deg)`,opacity:1,offset:.42},
+  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.62},
+  {transform:`translate(0px,${exitY}px) rotate(${who==='eddie'?-6:8}deg)`,opacity:0,offset:1}
+ ],{duration:T,fill:'both',easing:'linear'}));
+ const shut=hand.querySelector('.pose-shut'),open=hand.querySelector('.pose-open');
+ const pose={duration:T,fill:'both',easing:'linear'};
+ if(shut)pending.push(shut.animate([{opacity:1,offset:0},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:1}],pose));
+ if(open)pending.push(open.animate([{opacity:0,offset:0},{opacity:0,offset:.2},{opacity:1,offset:.44},{opacity:1,offset:1}],pose));
+ loose.forEach(({el,i},order)=>{
+  const rect=el.getBoundingClientRect();
+  const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const jx=(i-2)*11+((i%2)?6:-5),jy=(who==='eddie'?-6:8)+(i%2?4:-3);
+  const dx=releaseV.x+jx-cx,dy=releaseV.y+jy-cy,tilt=TILT[i],stagger=order*0.03;
+  el.classList.add('pouring');el.style.zIndex=String(4+order);
+  el.setAttribute('aria-label',`Kość ${i+1}: w ruchu`);
+  const keys=[
+   motion(dx,dy+entryY,-36+i*16,.58,0),
+   motion(dx,dy,28+i*12,.66,1),
+   motion(dx*.4+(i-2)*12,dy*.32+(who==='eddie'?-20:14),150+order*28,.96,1),
+   motion(0,who==='eddie'?6:-5,tilt+12,1.03,1),
+   motion(0,who==='eddie'?-3:3,tilt-4,1,1),
+   motion(0,0,tilt,1,1)
+  ];
+  keys[0].offset=0;keys[1].offset=.20+stagger*.15;keys[1].easing='cubic-bezier(.16,.82,.24,1)';
+  keys[2].offset=.48+stagger;keys[3].offset=Math.min(.82,.70+stagger);
+  keys[4].offset=Math.min(.94,.86+stagger*.2);keys[5].offset=1;
+  pending.push(el.animate(keys,{duration:T,fill:'both',easing:'linear'}));
+  const cube=el.querySelector('.cube'),end=FACE_ROT[finals[i]]||FACE_ROT[1];
+  const dir=i%2?-1:1,spinX=end[0]+360*(2+(i%2)),spinY=end[1]+360*(2+(order%3));
+  if(cube)pending.push(cube.animate([
+   {transform:`rotateX(${spinX+70*dir}deg) rotateY(${spinY-40}deg)`,offset:0},
+   {transform:`rotateX(${end[0]+200*dir}deg) rotateY(${end[1]+240}deg)`,offset:.45},
+   {transform:`rotateX(${end[0]+28}deg) rotateY(${end[1]-18}deg)`,offset:.8},
+   {transform:`rotateX(${end[0]}deg) rotateY(${end[1]}deg)`,offset:1}
+  ],{duration:T,fill:'both',easing:'cubic-bezier(.16,.72,.22,1)'}));
+  later(()=>{if(token===version)tableSound('clack-'+(1+(order%3)));},Math.round(T*(.3+order*.045)));
+ });
+ if(loose.length)later(()=>{if(token===version)tableSound('landing');},Math.round(T*.82));
+ await Promise.all(pending.map(a=>a.finished.catch(()=>{})));
 }
 
 async function eddieTurn(token){
  clearTimeout(chatTimer);$('duel').classList.add('eddie-turn');state.held=Array(5).fill(false);renderDice();say('eddie','speaking');let dice=[],held=Array(5).fill(false);$('roll-counter').textContent='RZUT — / 3';
  for(let n=1;n<=3;n++){
   await delay(n===1?650:750);if(token!==version)return;
-  dice=n===1?Array.from({length:5},randomDie):dice.map((v,i)=>held[i]?v:randomDie());mood('throwing',800);await tumble(token,held);if(token!==version)return;state.eddieDice=dice;state.dice=dice;state.held=Array(5).fill(false);renderDice();renderMini(dice);landThrow(dice,held);
+  dice=n===1?Array.from({length:5},randomDie):dice.map((v,i)=>held[i]?v:randomDie());try{await pour(token,{who:'eddie',held,finals:dice});}catch(_){}if(token!==version)return;state.eddieDice=dice;state.dice=dice;state.held=Array(5).fill(false);renderDice();renderMini(dice);landThrow(dice);
   $('roll-counter').textContent=`RZUT ${n} / 3`;$('eddie-action').textContent=`Rzut ${n}/3 · Eddie przygląda się kościom…`;
   say(E.score('yahtzee',dice)?'beast':classify(dice)==='great'?'eddieGreat':classify(dice)==='bad'?'eddieBad':'eddie');
   if(n===3)break;
@@ -195,4 +269,5 @@ $('roll').onclick=playerRoll;$('new-game').onclick=newGame;$('result-new').oncli
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
 $('sound').onclick=()=>{sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));if(sound)tableSound('hold');else stopTableSound();};
 $('skip-intro').onclick=stopIntro;$('replay-intro').onclick=startIntro;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('intro').hidden)stopIntro();});
+addEventListener('resize',()=>{if(!rolling)sizeDice();});
 newGame();let seen=false;try{seen=sessionStorage.getItem('eddie-intro')==='seen';}catch(_){}if(seen){$('intro').hidden=true;}else startIntro();
