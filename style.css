@@ -128,7 +128,7 @@
 .pour-hands{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
 .hand{position:absolute;top:0;left:0;opacity:0;pointer-events:none;filter:drop-shadow(0 10px 8px #0008)}
 .hand-svg{display:block;width:100%;height:auto;overflow:visible}
-.eddie-fist{width:min(300px,72%)}
+.eddie-fist{width:min(300px,72%);aspect-ratio:640/993}.eddie-fist .hand-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .player-hand{width:min(360px,96%)}
 .pose{opacity:0}
 .avatar[data-mood=watching]{animation:watchIt 1.15s ease}

@@ -4,9 +4,9 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#17100d">
 <title>Eddie's Dice of the Beast</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=11">
 <script src="tour-nations.js" defer></script><script src="tour.js" defer></script>
-<script src="engine.js" defer></script><script src="game.js" defer></script>
+<script src="engine.js?v=11" defer></script><script src="game.js?v=11" defer></script>
 </head>
 <body>
 <div id="intro" class="intro" aria-label="Filmowe wprowadzenie">
@@ -52,59 +52,9 @@
       </div>
       </div>
       <div class="pour-hands" id="pour-hands" aria-hidden="true">
-        <div class="hand eddie-fist" id="eddie-fist">
-          <svg class="hand-svg" viewBox="0 0 280 340" data-palm-x="0.48" data-palm-y="0.50" focusable="false">
-            <g class="arm">
-              <path d="M96 18h88l16 58H80Z" fill="#14110e" stroke="#1a1612" stroke-width="3" stroke-linejoin="round"/>
-              <path d="M88 64h104l8 22H80Z" fill="#efe6d2" stroke="#1a1612" stroke-width="2"/>
-              <rect x="104" y="78" width="72" height="70" rx="24" fill="#7d8c74" stroke="#1a1612" stroke-width="3"/>
-            </g>
-            <g class="pose pose-shut" fill="#7d8c74" stroke="#1a1612" stroke-width="3">
-              <rect x="58" y="96" width="150" height="108" rx="52"/>
-              <ellipse cx="92" cy="188" rx="18" ry="15"/>
-              <ellipse cx="128" cy="198" rx="20" ry="16"/>
-              <ellipse cx="166" cy="196" rx="20" ry="16"/>
-              <ellipse cx="200" cy="184" rx="17" ry="14"/>
-              <g transform="translate(36,128) rotate(-26)">
-                <rect width="26" height="62" rx="13" fill="#6e7e64"/>
-                <ellipse cx="13" cy="56" rx="8" ry="6" fill="#e7dcc4" stroke-width="1.5"/>
-              </g>
-            </g>
-            <g class="pose pose-open">
-              <g fill="#7d8c74" stroke="#1a1612" stroke-width="3" stroke-linejoin="round">
-                <g transform="rotate(8 66 230)">
-                  <rect x="50" y="168" width="24" height="108" rx="12"/>
-                  <rect x="59" y="186" width="5" height="72" rx="2" fill="#d9d0b4" stroke="none" opacity=".75"/>
-                  <ellipse cx="62" cy="270" rx="7" ry="5" fill="#e7dcc4" stroke-width="1.5"/>
-                </g>
-                <g>
-                  <rect x="86" y="160" width="28" height="124" rx="14"/>
-                  <rect x="97" y="180" width="5" height="84" rx="2" fill="#d9d0b4" stroke="none" opacity=".75"/>
-                  <ellipse cx="100" cy="278" rx="8" ry="5.5" fill="#e7dcc4" stroke-width="1.5"/>
-                </g>
-                <g>
-                  <rect x="124" y="154" width="30" height="138" rx="15"/>
-                  <rect x="136" y="176" width="6" height="96" rx="2" fill="#d9d0b4" stroke="none" opacity=".75"/>
-                  <ellipse cx="139" cy="286" rx="8" ry="5.5" fill="#e7dcc4" stroke-width="1.5"/>
-                </g>
-                <g transform="rotate(-7 178 230)">
-                  <rect x="164" y="164" width="26" height="114" rx="13"/>
-                  <rect x="174" y="182" width="5" height="76" rx="2" fill="#d9d0b4" stroke="none" opacity=".75"/>
-                  <ellipse cx="177" cy="272" rx="7" ry="5" fill="#e7dcc4" stroke-width="1.5"/>
-                </g>
-              </g>
-              <g fill="none" stroke="#243028" stroke-width="2" stroke-linecap="round">
-                <path d="M56 206h16M92 204h18M130 202h20M170 206h16"/>
-                <path d="M56 236h14M94 238h16M132 240h18M172 234h14"/>
-              </g>
-              <rect x="44" y="108" width="164" height="96" rx="46" fill="#7d8c74" stroke="#1a1612" stroke-width="3"/>
-              <path d="M78 150c28 14 64 14 100 0M72 172c34 12 78 8 110-8" fill="none" stroke="#243028" stroke-width="2"/>
-              <g transform="translate(188,120) rotate(38)">
-                <rect width="26" height="74" rx="13" fill="#6e7e64" stroke="#1a1612" stroke-width="3"/>
-                <ellipse cx="13" cy="66" rx="8" ry="6" fill="#e7dcc4" stroke="#1a1612" stroke-width="1.4"/>
-              </g>
-            </g>
-          </svg>
+        <div class="hand eddie-fist" id="eddie-fist" data-palm-x="0.40" data-palm-y="0.62">
+          <img class="hand-art pose pose-shut" src="assets/eddie-hand-shut.webp" alt="" width="640" height="993" draggable="false">
+          <img class="hand-art pose pose-open" src="assets/eddie-hand-open.webp" alt="" width="640" height="993" draggable="false">
         </div>
         <div class="hand player-hand" id="player-hand">
           <svg class="hand-svg" viewBox="0 0 300 360" data-palm-x="0.51" data-palm-y="0.51" focusable="false">

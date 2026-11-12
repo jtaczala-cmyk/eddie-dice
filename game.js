@@ -148,28 +148,38 @@ async function pour(token,{who,held,finals}){
  const loose=buttons.map((el,i)=>({el,i})).filter(d=>!held[d.i]);
  startThrow(who);if(token!==version)return;
  const hand=$(who==='eddie'?'eddie-fist':'player-hand');
- const svg=hand.querySelector('svg');
+ const palmSrc=hand.querySelector('svg')||hand;
  const tray=$('dice').getBoundingClientRect();
  const root=$('pour-hands').getBoundingClientRect();
  if(hand.offsetWidth<20||tray.width<20)return;
  const releaseV=who==='eddie'
   ?{x:tray.left+tray.width/2,y:tray.top+Math.max(28,tray.height*0.22)}
   :{x:tray.left+tray.width/2,y:tray.bottom+28};
- const px=parseFloat(svg.dataset.palmX)||.5,py=parseFloat(svg.dataset.palmY)||.5;
+ const px=parseFloat(palmSrc.dataset.palmX)||.5,py=parseFloat(palmSrc.dataset.palmY)||.5;
  hand.style.left=(releaseV.x-root.left-hand.offsetWidth*px)+'px';
  hand.style.top=(releaseV.y-root.top-hand.offsetHeight*py)+'px';
  const felt=document.querySelector('.table-felt').getBoundingClientRect(),duel=$('duel').getBoundingClientRect();
  const entryY=who==='eddie'?Math.min(-80,(felt.top-24)-releaseV.y):Math.max(110,(duel.bottom+16)-releaseV.y);
  const exitY=who==='eddie'?entryY-24:entryY+28;
  const T=POUR_MS,pending=[];
- pending.push(hand.animate([
-  {transform:`translate(0px,${entryY}px) rotate(${who==='eddie'?-8:7}deg)`,opacity:0,offset:0},
-  {transform:`translate(0px,${entryY*.35}px) rotate(${who==='eddie'?-3:3}deg)`,opacity:1,offset:.14},
-  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.24},
-  {transform:`translate(0px,${who==='eddie'?10:-8}px) rotate(${who==='eddie'?4:-5}deg)`,opacity:1,offset:.42},
+ const handKeys=who==='eddie'?[
+  {transform:`translate(0px,${entryY}px) rotate(-8deg)`,opacity:0,offset:0},
+  {transform:`translate(0px,${entryY*.35}px) rotate(-4deg)`,opacity:1,offset:.14},
+  {transform:'translate(6px,4px) rotate(7deg)',opacity:1,offset:.22},
+  {transform:'translate(-7px,-2px) rotate(-9deg)',opacity:1,offset:.30},
+  {transform:'translate(8px,10px) rotate(8deg)',opacity:1,offset:.38},
+  {transform:'translate(-4px,4px) rotate(-5deg)',opacity:1,offset:.46},
   {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.62},
-  {transform:`translate(0px,${exitY}px) rotate(${who==='eddie'?-6:8}deg)`,opacity:0,offset:1}
- ],{duration:T,fill:'both',easing:'linear'}));
+  {transform:`translate(0px,${exitY}px) rotate(-6deg)`,opacity:0,offset:1}
+ ]:[
+  {transform:`translate(0px,${entryY}px) rotate(7deg)`,opacity:0,offset:0},
+  {transform:`translate(0px,${entryY*.35}px) rotate(3deg)`,opacity:1,offset:.14},
+  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.24},
+  {transform:'translate(0px,-8px) rotate(-5deg)',opacity:1,offset:.42},
+  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.62},
+  {transform:`translate(0px,${exitY}px) rotate(8deg)`,opacity:0,offset:1}
+ ];
+ pending.push(hand.animate(handKeys,{duration:T,fill:'both',easing:'linear'}));
  const shut=hand.querySelector('.pose-shut'),open=hand.querySelector('.pose-open');
  const pose={duration:T,fill:'both',easing:'linear'};
  if(shut)pending.push(shut.animate([{opacity:1,offset:0},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:1}],pose));
