@@ -128,7 +128,7 @@
 .pour-hands{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
 .hand{position:absolute;top:0;left:0;opacity:0;pointer-events:none;filter:drop-shadow(0 10px 8px #0008)}
 .hand-svg{display:block;width:100%;height:auto;overflow:visible}
-.eddie-fist{width:min(300px,72%);aspect-ratio:640/993}.eddie-fist .hand-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.eddie-fist{width:min(300px,72%);aspect-ratio:640/993;opacity:1}.eddie-fist .pose-shut{opacity:1}.eddie-fist .pose-open{opacity:0}.eddie-fist .hand-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .player-hand{width:min(360px,96%)}
 .pose{opacity:0}
 .avatar[data-mood=watching]{animation:watchIt 1.15s ease}
@@ -137,12 +137,13 @@
 @keyframes reachIt{0%{transform:none}30%{transform:translateY(16px) scale(1.035)}68%{transform:translateY(8px) scale(1.02)}100%{transform:none}}
 @media(max-width:720px){
   .table-board{margin:0 0 8px;padding:8px}
-  .eddie-fist{width:min(230px,72vw)}
+  .eddie-fist{width:min(280px,84vw)}
   .player-hand{width:min(300px,94vw)}
   .duel .dice-tray{padding-top:68px}
   .duel .table-felt{padding:12px 10px 10px}
 }
 @media(prefers-reduced-motion:reduce){
-  .hand,.pose{animation:none!important;opacity:0!important}
+  .hand:not(.eddie-fist),.player-hand .pose,.eddie-fist .pose-open{animation:none!important;opacity:0!important}
+  .eddie-fist,.eddie-fist .pose-shut{animation:none!important;opacity:1!important}
   .avatar[data-mood=watching],.avatar[data-mood=reaching]{animation:none!important}
 }
