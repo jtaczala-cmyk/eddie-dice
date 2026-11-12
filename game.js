@@ -70,6 +70,7 @@ function clearThrow(){
  pourTimers.splice(0).forEach(clearTimeout);
  for(const id of ['eddie-fist','player-hand']){const h=$(id);if(!h)continue;cancelAnims(h);h.querySelectorAll('*').forEach(cancelAnims);}
  for(const el of $('dice').children){cancelAnims(el);cancelAnims(el.querySelector('.cube'));el.classList.remove('pouring','landed','rolling');el.style.zIndex='';}
+ resetPlayerHand();
  parkEddieHand();
 }
 function startThrow(who){
@@ -142,24 +143,79 @@ async function assign(id){
  if(state.turn!=='player'||!state.rolls||rolling||state.player[id]!==undefined)return;
  clearTimeout(chatTimer);tableSound('stamp');state.player[id]=E.score(id,state.dice);state.turn='eddie';$('hint').textContent='Twój wynik został zapisany. Teraz kości przejmuje Eddie.';render();await eddieTurn(version);
 }
-function eddieRestTarget(){
- const hand=$('eddie-fist'),rootEl=$('pour-hands'),feltEl=document.querySelector('.table-felt');
- if(!hand||!rootEl||!feltEl||hand.offsetWidth<20)return null;
- const root=rootEl.getBoundingClientRect(),felt=feltEl.getBoundingClientRect();
- if(felt.width<20)return null;
- const px=parseFloat(hand.dataset.palmX)||.4,py=parseFloat(hand.dataset.palmY)||.62;
- const palmX=felt.left+felt.width/2,palmY=felt.top+Math.min(40,Math.max(18,felt.height*.12));
- return {left:palmX-root.left-hand.offsetWidth*px,top:palmY-root.top-hand.offsetHeight*py,palmX,palmY};
+function boxOf(sel){const el=typeof sel==='string'?document.querySelector(sel):sel;if(!el)return null;const r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}
+function overlaps(a,b,pad=0){if(!a||!b)return false;return a.left<b.right+pad&&a.right>b.left-pad&&a.top<b.bottom+pad&&a.bottom>b.top-pad;}
+function eddieRestSlot(){
+ const root=boxOf('#pour-hands'),felt=boxOf('.table-felt');
+ if(!root||!felt||felt.width<20)return null;
+ const label=boxOf('#turn-label'),counter=boxOf('#roll-counter');
+ const avatar=boxOf('.avatar'),action=boxOf('#eddie-action'),mini=boxOf('#eddie-dice'),edge=boxOf('.table-edge');
+ // Collide with the visible cubes, not the padded #dice tray (the tray's padding-top is empty felt).
+ const dieBoxes=[...document.querySelectorAll('#dice .die')].map(el=>boxOf(el)).filter(Boolean);
+ const diceTop=dieBoxes.length?Math.min(...dieBoxes.map(b=>b.top)):(boxOf('#dice')?boxOf('#dice').top:null);
+ const blockers=[label,counter,avatar,action,mini,...dieBoxes].filter(Boolean);
+ const narrow=innerWidth<=720;
+ const wantW=narrow?Math.min(140,Math.max(110,felt.width*.34)):Math.min(200,Math.max(150,felt.width*.18));
+ const ar=964/594;
+ const margin=6;
+ const gapLeft=(label?label.right:felt.left)+margin;
+ const gapRight=(counter?counter.left:felt.right)-margin;
+ const gapTop=Math.max(edge?edge.bottom-8:felt.top,avatar?avatar.bottom+6:felt.top);
+ const gapBottom=Math.min(diceTop!=null?diceTop-margin:felt.top+120,action?action.top-margin:1e9,mini?mini.top-margin:1e9);
+ let w=wantW,h=Math.round(w/ar);
+ const maxH=Math.max(0,gapBottom-gapTop);
+ if(maxH>=36&&h>maxH){h=maxH;w=Math.round(h*ar);}
+ const slotW=Math.max(0,gapRight-gapLeft);
+ if(slotW>=40&&w>slotW){w=slotW;h=Math.round(w/ar);if(maxH>=36&&h>maxH){h=maxH;w=Math.round(h*ar);}}
+ let left,top;
+ if(slotW>=w){left=gapLeft+(slotW-w)/2;}
+ else{left=Math.max(felt.left+margin,Math.min(gapLeft,felt.right-w-margin));}
+ // Sit toward the far rail, not down on the dice.
+ const room=Math.max(0,gapBottom-gapTop-h);
+ top=gapTop+Math.round(room*0.2);
+ const cand={left,top,right:left+w,bottom:top+h,width:w,height:h};
+ for(const b of blockers){
+  if(!overlaps(cand,b,4))continue;
+  if(b.left-w-margin>=(label?label.right:felt.left)){cand.left=b.left-w-margin;cand.right=cand.left+w;}
+  else if(b.right+margin+w<=(counter?counter.left:felt.right)){cand.left=b.right+margin;cand.right=cand.left+w;}
+  if(b.top-h-4>=gapTop){cand.top=b.top-h-4;cand.bottom=cand.top+h;}
+  else if(b.bottom+4+h<=(diceTop||cand.bottom+h)){cand.top=b.bottom+4;cand.bottom=cand.top+h;}
+ }
+ if(avatar&&cand.top<avatar.bottom+4){cand.top=avatar.bottom+4;cand.bottom=cand.top+cand.height;}
+ if(diceTop&&cand.bottom>diceTop-margin){
+  cand.bottom=diceTop-margin;
+  cand.height=Math.max(0,cand.bottom-cand.top);
+  if(cand.height>0&&cand.height<h){cand.width=Math.round(cand.height*ar);cand.right=cand.left+cand.width;}
+ }
+ cand.width=cand.right-cand.left;cand.height=cand.bottom-cand.top;cand.right=cand.left+cand.width;cand.bottom=cand.top+cand.height;
+ return {left:cand.left-root.left,top:cand.top-root.top,width:cand.width,height:cand.height,view:cand};
+}
+function setEddieThrowing(on){
+ const hand=$('eddie-fist');if(!hand)return;
+ hand.classList.toggle('throwing',!!on);
+ hand.classList.toggle('at-rest',!on);
+ if(on){hand.style.width='';hand.style.height='';}
+}
+function resetPlayerHand(){
+ const hand=$('player-hand');if(!hand)return;
+ cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);
+ hand.style.transform='';hand.style.opacity='';hand.style.left='';hand.style.top='';
+ for(const sel of ['.pose-shut','.pose-open']){
+  const el=hand.querySelector(sel);if(el){el.style.opacity='';el.style.transform='';}
+ }
 }
 function parkEddieHand(){
- const hand=$('eddie-fist'),rest=eddieRestTarget();
- if(!hand||!rest)return;
+ const hand=$('eddie-fist');if(!hand)return;
  cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);
- hand.style.left=rest.left+'px';hand.style.top=rest.top+'px';
+ setEddieThrowing(false);
  hand.style.transform='';hand.style.opacity='';
- const shut=hand.querySelector('.pose-shut'),open=hand.querySelector('.pose-open');
- if(shut){shut.style.opacity='';shut.style.transform='';}
- if(open){open.style.opacity='';open.style.transform='';}
+ const slot=eddieRestSlot();
+ if(!slot)return;
+ hand.style.width=slot.width+'px';hand.style.height=slot.height+'px';
+ hand.style.left=slot.left+'px';hand.style.top=slot.top+'px';
+ for(const sel of ['.pose-rest','.pose-shut','.pose-open']){
+  const el=hand.querySelector(sel);if(el){el.style.opacity='';el.style.transform='';}
+ }
 }
 function scheduleParkEddie(){requestAnimationFrame(()=>{parkEddieHand();requestAnimationFrame(parkEddieHand);});}
 // Pour loose dice out of a hand. The cube's rest rotation is the real rolled face.
@@ -169,26 +225,25 @@ async function pour(token,{who,held,finals}){
  const loose=buttons.map((el,i)=>({el,i})).filter(d=>!held[d.i]);
  startThrow(who);if(token!==version)return;
  const hand=$(who==='eddie'?'eddie-fist':'player-hand');
- const palmSrc=hand.querySelector('svg')||hand;
  const tray=$('dice').getBoundingClientRect();
  const root=$('pour-hands').getBoundingClientRect();
  if(hand.offsetWidth<20||tray.width<20)return;
  const releaseV=who==='eddie'
   ?{x:tray.left+tray.width/2,y:tray.top+Math.max(28,tray.height*0.22)}
   :{x:tray.left+tray.width/2,y:tray.bottom+28};
- const px=parseFloat(palmSrc.dataset.palmX)||.5,py=parseFloat(palmSrc.dataset.palmY)||.5;
+ const px=parseFloat(hand.dataset.palmX)||.5,py=parseFloat(hand.dataset.palmY)||.5;
  const felt=document.querySelector('.table-felt').getBoundingClientRect(),duel=$('duel').getBoundingClientRect();
- let restDX=0,restDY=0;
+ let restDX=0,restDY=0,flipX=0,flipY=0,flipSX=1,flipSY=1;
  if(who==='eddie'){
-  const rest=eddieRestTarget();
-  if(rest){
-   hand.style.left=rest.left+'px';hand.style.top=rest.top+'px';
-   restDX=(releaseV.x-root.left-hand.offsetWidth*px)-rest.left;
-   restDY=(releaseV.y-root.top-hand.offsetHeight*py)-rest.top;
-  }else{
-   hand.style.left=(releaseV.x-root.left-hand.offsetWidth*px)+'px';
-   hand.style.top=(releaseV.y-root.top-hand.offsetHeight*py)+'px';
-  }
+  const first=hand.getBoundingClientRect();
+  setEddieThrowing(true);
+  hand.style.left=(releaseV.x-root.left-hand.offsetWidth*px)+'px';
+  hand.style.top=(releaseV.y-root.top-hand.offsetHeight*py)+'px';
+  void hand.offsetWidth;
+  const last=hand.getBoundingClientRect();
+  flipSX=first.width/Math.max(1,last.width);flipSY=first.height/Math.max(1,last.height);
+  // Centers, because WAAPI scale/rotate use the default transform-origin (50% 50%).
+  flipX=(first.left+first.width/2)-(last.left+last.width/2);flipY=(first.top+first.height/2)-(last.top+last.height/2);
  }else{
   hand.style.left=(releaseV.x-root.left-hand.offsetWidth*px)+'px';
   hand.style.top=(releaseV.y-root.top-hand.offsetHeight*py)+'px';
@@ -197,14 +252,14 @@ async function pour(token,{who,held,finals}){
  const exitY=who==='eddie'?entryY-24:entryY+28;
  const T=POUR_MS,pending=[];
  const handKeys=who==='eddie'?[
-  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:0},
-  {transform:`translate(${(restDX*.55).toFixed(2)}px,${(restDY*.55).toFixed(2)}px) rotate(-4deg)`,opacity:1,offset:.14},
-  {transform:`translate(${(restDX+6).toFixed(2)}px,${(restDY+4).toFixed(2)}px) rotate(7deg)`,opacity:1,offset:.22},
-  {transform:`translate(${(restDX-7).toFixed(2)}px,${(restDY-2).toFixed(2)}px) rotate(-9deg)`,opacity:1,offset:.30},
-  {transform:`translate(${(restDX+8).toFixed(2)}px,${(restDY+10).toFixed(2)}px) rotate(8deg)`,opacity:1,offset:.38},
-  {transform:`translate(${(restDX-4).toFixed(2)}px,${(restDY+4).toFixed(2)}px) rotate(-5deg)`,opacity:1,offset:.46},
-  {transform:`translate(${restDX.toFixed(2)}px,${restDY.toFixed(2)}px) rotate(0deg)`,opacity:1,offset:.62},
-  {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:1}
+  {transform:`translate(${flipX.toFixed(2)}px,${flipY.toFixed(2)}px) scale(${flipSX.toFixed(3)},${flipSY.toFixed(3)}) rotate(0deg)`,opacity:1,offset:0},
+  {transform:`translate(${(flipX*.45).toFixed(2)}px,${(flipY*.45).toFixed(2)}px) scale(${Math.min(1,flipSX+0.35).toFixed(3)},${Math.min(1,flipSY+0.35).toFixed(3)}) rotate(-4deg)`,opacity:1,offset:.14},
+  {transform:'translate(6px,4px) rotate(7deg) scale(1,1)',opacity:1,offset:.22},
+  {transform:'translate(-7px,-2px) rotate(-9deg) scale(1,1)',opacity:1,offset:.30},
+  {transform:'translate(8px,10px) rotate(8deg) scale(1,1)',opacity:1,offset:.38},
+  {transform:'translate(-4px,4px) rotate(-5deg) scale(1,1)',opacity:1,offset:.46},
+  {transform:'translate(0px,0px) rotate(0deg) scale(1,1)',opacity:1,offset:.62},
+  {transform:`translate(${flipX.toFixed(2)}px,${flipY.toFixed(2)}px) scale(${flipSX.toFixed(3)},${flipSY.toFixed(3)}) rotate(0deg)`,opacity:1,offset:1}
  ]:[
   {transform:`translate(0px,${entryY}px) rotate(7deg)`,opacity:0,offset:0},
   {transform:`translate(0px,${entryY*.35}px) rotate(3deg)`,opacity:1,offset:.14},
@@ -217,8 +272,10 @@ async function pour(token,{who,held,finals}){
  const shut=hand.querySelector('.pose-shut'),open=hand.querySelector('.pose-open');
  const pose={duration:T,fill:'both',easing:'linear'};
  if(who==='eddie'){
-  if(shut)pending.push(shut.animate([{opacity:1,offset:0},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:.62},{opacity:1,offset:1}],pose));
-  if(open)pending.push(open.animate([{opacity:0,offset:0},{opacity:0,offset:.2},{opacity:1,offset:.44},{opacity:1,offset:.62},{opacity:0,offset:1}],pose));
+  const restPose=hand.querySelector('.pose-rest');
+  if(restPose)pending.push(restPose.animate([{opacity:1,offset:0},{opacity:0,offset:.16},{opacity:0,offset:.84},{opacity:1,offset:1}],pose));
+  if(shut)pending.push(shut.animate([{opacity:0,offset:0},{opacity:1,offset:.16},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:.62},{opacity:1,offset:.84},{opacity:0,offset:1}],pose));
+  if(open)pending.push(open.animate([{opacity:0,offset:0},{opacity:0,offset:.2},{opacity:1,offset:.44},{opacity:1,offset:.62},{opacity:0,offset:.84},{opacity:0,offset:1}],pose));
  }else{
   if(shut)pending.push(shut.animate([{opacity:1,offset:0},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:1}],pose));
   if(open)pending.push(open.animate([{opacity:0,offset:0},{opacity:0,offset:.2},{opacity:1,offset:.44},{opacity:1,offset:1}],pose));
@@ -255,7 +312,7 @@ async function pour(token,{who,held,finals}){
  });
  if(loose.length)later(()=>{if(token===version)tableSound('landing');},Math.round(T*.82));
  await Promise.all(pending.map(a=>a.finished.catch(()=>{})));
- if(who==='eddie'&&token===version)parkEddieHand();
+ if(token===version){if(who==='eddie')parkEddieHand();else resetPlayerHand();}
 }
 
 async function eddieTurn(token){
