@@ -127,9 +127,14 @@
 
 .pour-hands{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
 .hand{position:absolute;top:0;left:0;opacity:0;pointer-events:none;filter:drop-shadow(0 10px 8px #0008)}
-.hand-svg{display:block;width:100%;height:auto;overflow:visible}
-.eddie-fist{width:min(300px,72%);aspect-ratio:640/993;opacity:1}.eddie-fist .pose-shut{opacity:1}.eddie-fist .pose-open{opacity:0}.eddie-fist .hand-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.player-hand{width:min(360px,96%)}
+.hand .hand-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.eddie-fist{width:min(300px,72%);aspect-ratio:640/993;opacity:1;z-index:6}.eddie-fist .pose-shut,.eddie-fist .pose-open,.eddie-fist .pose-rest{opacity:0}
+.eddie-fist.at-rest{width:min(140px,18%);aspect-ratio:964/594;height:auto;overflow:visible;z-index:5}
+.eddie-fist.at-rest .pose-rest{opacity:1;object-fit:contain}
+.eddie-fist.throwing .pose-shut{opacity:1}
+.player-hand{width:min(300px,72%);aspect-ratio:640/993;z-index:6}
+.player-hand .hand-art{transform:rotate(180deg)}
+.player-hand .pose-shut,.player-hand .pose-open{opacity:0}
 .pose{opacity:0}
 .avatar[data-mood=watching]{animation:watchIt 1.15s ease}
 @keyframes watchIt{35%{transform:translateY(8px) scale(1.015)}70%{transform:translateY(3px)}}
@@ -138,12 +143,13 @@
 @media(max-width:720px){
   .table-board{margin:0 0 8px;padding:8px}
   .eddie-fist{width:min(280px,84vw)}
-  .player-hand{width:min(300px,94vw)}
+  .eddie-fist.at-rest{width:min(136px,36vw);height:auto;aspect-ratio:964/594}
+  .player-hand{width:min(280px,84vw)}
   .duel .dice-tray{padding-top:68px}
   .duel .table-felt{padding:12px 10px 10px}
 }
 @media(prefers-reduced-motion:reduce){
-  .hand:not(.eddie-fist),.player-hand .pose,.eddie-fist .pose-open{animation:none!important;opacity:0!important}
-  .eddie-fist,.eddie-fist .pose-shut{animation:none!important;opacity:1!important}
+  .player-hand,.player-hand .pose,.eddie-fist .pose-shut,.eddie-fist .pose-open{animation:none!important;opacity:0!important}
+  .eddie-fist,.eddie-fist.at-rest .pose-rest{animation:none!important;opacity:1!important}
   .avatar[data-mood=watching],.avatar[data-mood=reaching]{animation:none!important}
 }
