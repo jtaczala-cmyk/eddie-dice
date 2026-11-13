@@ -59,7 +59,7 @@ function fallbackSound(kind){
 }
 function tableSound(kind){
  if(!sound||!$('intro').hidden)return;
- const voice=new Audio('sfx/'+kind+'.wav');voice.volume=.7;activeSfx.add(voice);let failed=false;
+ const voice=new Audio('sfx/'+kind+'.wav?v=19');voice.volume=.7;activeSfx.add(voice);let failed=false;
  const fail=()=>{activeSfx.delete(voice);if(!failed){failed=true;fallbackSound(kind);}};
  voice.onended=()=>activeSfx.delete(voice);voice.onerror=fail;
  try{const playing=voice.play();if(playing)playing.catch(fail);}catch(_){fail();}
@@ -100,48 +100,61 @@ function renderDice() {
  const tray=$('dice');tray.replaceChildren();
  state.dice.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='die'+(state.held[i]?' held':'');b.style.setProperty('--tilt',TILT[i]+'deg');b.innerHTML=dieCube(v);b.disabled=state.turn!=='player'||state.rolls===0||rolling||state.rolls>=3;b.setAttribute('aria-label',`Kość ${i+1}: ${state.rolls?v:'jeszcze nie rzucona'}${state.held[i]?', zatrzymana':''}`);b.setAttribute('aria-pressed',String(state.held[i]));b.onclick=()=>{state.held[i]=!state.held[i];tableSound('hold');renderDice();$('dice').children[i].focus({preventScroll:true});};tray.append(b);});
  sizeDice();
+ if(!rolling)parkEddieHand();
 }
 function renderMini(dice=state.eddieDice,held=[]) {
  $('eddie-dice').innerHTML=dice.map((v,i)=>`<span class="mini-die${held[i]?' kept':''}" aria-label="${v}">${['','⚀','⚁','⚂','⚃','⚄','⚅'][v]}</span>`).join('');
 }
+function seriesSum(who){return E.totals(state[who]);}
 function renderCard() {
+ const idx=Math.max(0,Math.min(2,(state.series||1)-1));
  for(const who of ['player','eddie']){
-  const t=E.totals(state[who]);$(who+'-total').textContent=t.total;$(who+'-footer').textContent=t.total;$(who+'-upper').textContent=t.upper+' / 63';$(who+'-bonus').textContent=t.bonus;$(who+'-bonus').classList.toggle('bonus-earned',t.bonus>0);
- }
- for(const section of ['upper','lower']){
-  const tbody=$(section+'-rows');tbody.replaceChildren();
-  E.categories.filter(c=>section==='upper'?c.face:!c.face).forEach(c=>{
-   const tr=document.createElement('tr'),th=document.createElement('th');th.scope='row';th.textContent=c.label;tr.append(th);
-   const td=document.createElement('td');
-   if(state.player[c.id]!==undefined){td.textContent=state.player[c.id];td.className='recorded';}
-   else{const b=document.createElement('button');const available=state.turn==='player'&&state.rolls>0&&!rolling;const val=E.score(c.id,state.dice);b.textContent=available?val:'—';b.className='score-choice'+(val===0?' zero':'');b.disabled=!available;b.setAttribute('aria-label',available?`${c.label}: zapisz ${val} punktów`:`${c.label}: wolna kategoria`);b.onclick=()=>assign(c.id);td.append(b);}tr.append(td);
-   const enemy=document.createElement('td');enemy.textContent=state.eddie[c.id]??'—';enemy.className=state.eddie[c.id]!==undefined?'recorded':'';tr.append(enemy);tbody.append(tr);
-  });
+  const tr=$('score-'+who);if(!tr)continue;
+  const cells=[...tr.children]; // th + 3 series + suma
+  for(let i=0;i<3;i++){
+   const td=cells[i+1];if(!td)continue;
+   const v=state[who][i];
+   td.textContent=v==null?'—':v;
+   td.className=(v!=null?'recorded':'')+(i===idx&&state.turn!=='finished'?' current':'');
+  }
+  const sumCell=cells[4];if(sumCell){sumCell.textContent=seriesSum(who);sumCell.className='suma';}
+  tr.classList.toggle('active',state.turn===who||(state.turn==='finished'&&false));
  }
 }
 function render() {
- $('round').innerHTML=String(Math.min(state.round,13)).padStart(2,'0')+' <em>/ 13</em>';
+ const series=Math.min(state.series||1,3);
+ $('round').innerHTML=String(series).padStart(2,'0')+' <em>/ 3</em>';
  $('turn-label').textContent=state.turn==='player'?'TWÓJ RUCH':state.turn==='eddie'?'RUCH EDDIEGO':'KONIEC POJEDYNKU';
- $('roll-counter').textContent=`RZUT ${state.rolls||'—'} / 3`;
- $('roll').disabled=state.turn!=='player'||state.rolls>=3||rolling;
+ $('roll-counter').textContent=state.rolls?`RZUT ${state.rolls} / 3 · ${E.pipSum(state.dice)}`:'RZUT — / 3';
+ const canRoll=state.turn==='player'&&state.rolls<3&&!rolling;
+ const canSave=state.turn==='player'&&state.rolls>0&&!rolling&&state.player[series-1]==null;
+ $('roll').disabled=!canRoll;
  $('roll').innerHTML=rolling?'Kości w ruchu…':state.rolls===0?'Rzuć kośćmi <span>↗</span>':'Rzuć ponownie <span>↗</span>';
- $('roll-note').textContent=state.turn==='finished'?'Trzynaście rund. Jeden werdykt.':state.turn==='eddie'?'Eddie wybiera swój los…':state.rolls===3?'Wybierz kategorię na karcie':`Pozostało rzutów: ${3-state.rolls}`;
+ if($('save')){$('save').disabled=!canSave;$('save').classList.toggle('ready',canSave&&state.rolls===3);}
+ $('roll-note').textContent=state.turn==='finished'?'Trzy serie. Jeden werdykt.':state.turn==='eddie'?'Eddie rzuca w tej serii…':state.rolls===0?'Pierwszy rzut wszystkimi pięcioma kośćmi':state.rolls===3?'To ostatni rzut. Zapisz sumę oczek.':`Zatrzymaj kości albo rzuć ponownie. Pozostało poprawek: ${3-state.rolls}`;
  renderDice();renderCard();
 }
-const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-const randomDie=()=>1+Math.floor(Math.random()*6);
-function classify(dice){if(E.score('yahtzee',dice))return 'beast';if(E.score('large',dice)||E.score('full',dice)||E.score('four',dice))return 'great';if(dice.reduce((a,b)=>a+b,0)<=13)return 'bad';return 'normal';}
+const delay=ms=>new Promise(resolve=>setTimeout(resolve,window.__fast?0:ms));
+const randomDie=()=> (Array.isArray(window.__bag)&&window.__bag.length?window.__bag.shift():1+Math.floor(Math.random()*6));
+function classify(dice){return E.classify(dice);}
 async function playerRoll(){
  if(state.turn!=='player'||state.rolls>=3||rolling)return;
  clearTimeout(chatTimer);const token=version;rolling=true;const held=state.held.slice();
  const next=state.dice.map((v,i)=>held[i]?v:randomDie());render();
  try{await pour(token,{who:'player',held,finals:next});}catch(_){}if(token!==version)return;
  state.dice=next;state.rolls++;rolling=false;
- say(classify(state.dice));scheduleChatter();$('hint').textContent=state.rolls<3?'Kliknij kości, aby je zatrzymać, albo wybierz kategorię na karcie.':'To ostatni rzut. Wybierz jedną wolną kategorię na karcie.';render();landThrow(state.dice);
+ say(classify(state.dice));scheduleChatter();
+ $('hint').textContent=state.rolls<3?'Kliknij kości, aby je zatrzymać albo odznaczyć. Możesz też zapisać wynik już teraz.':'To ostatni rzut tej serii. Zapisz sumę oczek.';
+ render();landThrow(state.dice);
 }
-async function assign(id){
- if(state.turn!=='player'||!state.rolls||rolling||state.player[id]!==undefined)return;
- clearTimeout(chatTimer);tableSound('stamp');state.player[id]=E.score(id,state.dice);state.turn='eddie';$('hint').textContent='Twój wynik został zapisany. Teraz kości przejmuje Eddie.';render();await eddieTurn(version);
+async function saveSeries(){
+ const idx=(state.series||1)-1;
+ if(state.turn!=='player'||!state.rolls||rolling||state.player[idx]!=null)return;
+ clearTimeout(chatTimer);tableSound('stamp');
+ state.player[idx]=E.pipSum(state.dice);
+ state.turn='eddie';state.held=Array(5).fill(false);
+ $('hint').textContent='Zapisano '+state.player[idx]+' pkt. Teraz kości przejmuje Eddie.';
+ render();await eddieTurn(version);
 }
 function boxOf(sel){const el=typeof sel==='string'?document.querySelector(sel):sel;if(!el)return null;const r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}
 function overlaps(a,b,pad=0){if(!a||!b)return false;return a.left<b.right+pad&&a.right>b.left-pad&&a.top<b.bottom+pad&&a.bottom>b.top-pad;}
@@ -150,20 +163,30 @@ function eddieRestSlot(){
  if(!root||!felt||felt.width<20)return null;
  const label=boxOf('#turn-label'),counter=boxOf('#roll-counter');
  const avatar=boxOf('.avatar'),action=boxOf('#eddie-action'),mini=boxOf('#eddie-dice'),edge=boxOf('.table-edge');
- // Collide with the visible cubes, not the padded #dice tray (the tray's padding-top is empty felt).
  const dieBoxes=[...document.querySelectorAll('#dice .die')].map(el=>boxOf(el)).filter(Boolean);
  const diceTop=dieBoxes.length?Math.min(...dieBoxes.map(b=>b.top)):(boxOf('#dice')?boxOf('#dice').top:null);
- const blockers=[label,counter,avatar,action,mini,...dieBoxes].filter(Boolean);
+ const actionVisible=action&&action.height>2&&action.width>2;
+ const miniVisible=mini&&mini.height>2&&mini.width>2;
+ const blockers=[label,counter,actionVisible?action:null,miniVisible?mini:null,...dieBoxes].filter(Boolean);
+ const landscape=(innerHeight<=520&&innerWidth>innerHeight);
  const narrow=innerWidth<=720;
- const wantW=narrow?Math.min(140,Math.max(110,felt.width*.34)):Math.min(200,Math.max(150,felt.width*.18));
+ const wantW=(landscape||narrow)?116:150;
  const ar=964/594;
  const margin=6;
  const gapLeft=(label?label.right:felt.left)+margin;
  const gapRight=(counter?counter.left:felt.right)-margin;
- const gapTop=Math.max(edge?edge.bottom-8:felt.top,avatar?avatar.bottom+6:felt.top);
- const gapBottom=Math.min(diceTop!=null?diceTop-margin:felt.top+120,action?action.top-margin:1e9,mini?mini.top-margin:1e9);
+ // Prefer the felt band under the turn line. Only use the avatar as a top wall when it actually crosses that band.
+ const bandTop=Math.max(felt.top+4,edge?edge.bottom-6:felt.top,label?label.bottom+4:felt.top);
+ const avatarCrosses=avatar&&avatar.right>gapLeft&&avatar.left<gapRight&&avatar.bottom>bandTop;
+ let gapTop=Math.max(bandTop,avatarCrosses?avatar.bottom+4:bandTop);
+ const gapBottom=Math.min(diceTop!=null?diceTop-margin:felt.top+120,actionVisible?action.top-margin:1e9,miniVisible?mini.top-margin:1e9);
  let w=wantW,h=Math.round(w/ar);
- const maxH=Math.max(0,gapBottom-gapTop);
+ let maxH=gapBottom-gapTop;
+ if(maxH<40){
+  // Sit on the far rail, in the label/counter gap, even if we slightly overlap the turn line.
+  gapTop=Math.max(felt.top-8,edge?edge.top-2:felt.top-8);
+  maxH=Math.max(40,(diceTop!=null?diceTop-6:felt.top+80)-gapTop);
+ }
  if(maxH>=36&&h>maxH){h=maxH;w=Math.round(h*ar);}
  const slotW=Math.max(0,gapRight-gapLeft);
  if(slotW>=40&&w>slotW){w=slotW;h=Math.round(w/ar);if(maxH>=36&&h>maxH){h=maxH;w=Math.round(h*ar);}}
@@ -173,7 +196,7 @@ function eddieRestSlot(){
  // Sit toward the far rail, not down on the dice.
  const room=Math.max(0,gapBottom-gapTop-h);
  top=gapTop+Math.round(room*0.2);
- const cand={left,top,right:left+w,bottom:top+h,width:w,height:h};
+ let cand={left,top,right:left+w,bottom:top+h,width:w,height:h};
  for(const b of blockers){
   if(!overlaps(cand,b,4))continue;
   if(b.left-w-margin>=(label?label.right:felt.left)){cand.left=b.left-w-margin;cand.right=cand.left+w;}
@@ -181,13 +204,19 @@ function eddieRestSlot(){
   if(b.top-h-4>=gapTop){cand.top=b.top-h-4;cand.bottom=cand.top+h;}
   else if(b.bottom+4+h<=(diceTop||cand.bottom+h)){cand.top=b.bottom+4;cand.bottom=cand.top+h;}
  }
- if(avatar&&cand.top<avatar.bottom+4){cand.top=avatar.bottom+4;cand.bottom=cand.top+cand.height;}
+ if(avatarCrosses&&cand.top<avatar.bottom+4){cand.top=avatar.bottom+4;cand.bottom=cand.top+cand.height;}
  if(diceTop&&cand.bottom>diceTop-margin){
   cand.bottom=diceTop-margin;
   cand.height=Math.max(0,cand.bottom-cand.top);
   if(cand.height>0&&cand.height<h){cand.width=Math.round(cand.height*ar);cand.right=cand.left+cand.width;}
  }
  cand.width=cand.right-cand.left;cand.height=cand.bottom-cand.top;cand.right=cand.left+cand.width;cand.bottom=cand.top+cand.height;
+ cand=clearRestHand(cand,root,felt,{
+  label,counter,diceTop,dieBoxes,
+  action:actionVisible?action:null,mini:miniVisible?mini:null,
+  ar,wantW
+ });
+ if(!cand)return null;
  return {left:cand.left-root.left,top:cand.top-root.top,width:cand.width,height:cand.height,view:cand};
 }
 function setEddieThrowing(on){
@@ -200,21 +229,58 @@ function resetPlayerHand(){
  const hand=$('player-hand');if(!hand)return;
  cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);
  hand.style.transform='';hand.style.opacity='';hand.style.left='';hand.style.top='';
- for(const sel of ['.pose-shut','.pose-open']){
-  const el=hand.querySelector(sel);if(el){el.style.opacity='';el.style.transform='';}
+ for(const el of hand.querySelectorAll('.pose-frame,.pose-shut,.pose-open')){
+  el.style.opacity='';el.style.transform='';
  }
 }
+
+function boxPad(b,m){return {left:b.left-m,top:b.top-m,right:b.right+m,bottom:b.bottom+m,width:b.width+2*m,height:b.height+2*m};}
+function clearRestHand(cand,root,felt,ctx){
+ const M=6;
+ const anyHeld=[...document.querySelectorAll('#dice .die.held')].length>0;
+ const HOLD=anyHeld?0:10; // reserve only before a hold lifts the dice
+ const label=ctx.label,counter=ctx.counter,dieBoxes=ctx.dieBoxes||[];
+ const roll=boxOf('#roll'),save=boxOf('#save'),hint=boxOf('#hint')||boxOf('.hint');
+ const blockers=[label,counter,ctx.action,ctx.mini,roll,save,hint,...dieBoxes].filter(Boolean);
+ const hits=c=>blockers.filter(b=>overlaps(c, boxPad(b,M), 0));
+ const ar=ctx.ar||(964/594);
+ const wantW=ctx.wantW||116, wantH=Math.round(wantW/ar);
+ const diceTop=ctx.diceTop;
+ const railTop=label?label.top:felt.top;
+ const bandTop=(label?label.bottom:felt.top)+M;
+ const bandBot=diceTop!=null?diceTop-M-HOLD:felt.top+wantH+M+HOLD;
+ const gapLeft=(label?label.right:felt.left)+M;
+ const gapRight=(counter?counter.left:felt.right)-M;
+ let w=wantW,h=wantH;
+ const maxH=bandBot-bandTop, maxW=Math.max(40,gapRight-gapLeft);
+ // Layout is sized so the target hand fits. Only shrink if a held die has
+ // already lifted and the remaining band is slightly short.
+ if(maxH>=28&&h>maxH){h=maxH;w=Math.round(h*ar);}
+ if(maxW>=40&&w>maxW){w=maxW;h=Math.round(w/ar);if(maxH>=28&&h>maxH){h=maxH;w=Math.round(h*ar);}}
+ w=Math.max(40,w);h=Math.max(28,h);
+ const trySlot=left=>{
+  const top=bandTop+Math.max(0,Math.round((Math.max(0,maxH)-h)*0.15));
+  const c={left,top,width:w,height:h,right:left+w,bottom:top+h};
+  if(c.top<railTop) {c.top=railTop;c.bottom=c.top+h;}
+  return (c.left>=felt.left-2&&c.right<=felt.right+2&&!hits(c).length)?c:null;
+ };
+ const mid=gapLeft+(maxW-w)/2;
+ return trySlot(mid)||trySlot(gapLeft)||trySlot(gapRight-w)||trySlot(Math.max(felt.left+M, mid));
+}
+
 function parkEddieHand(){
  const hand=$('eddie-fist');if(!hand)return;
+ void document.body.offsetHeight;
  cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);
  setEddieThrowing(false);
  hand.style.transform='';hand.style.opacity='';
  const slot=eddieRestSlot();
- if(!slot)return;
+ if(!slot){hand.style.opacity='1';return;}
+ hand.style.opacity='';
  hand.style.width=slot.width+'px';hand.style.height=slot.height+'px';
  hand.style.left=slot.left+'px';hand.style.top=slot.top+'px';
- for(const sel of ['.pose-rest','.pose-shut','.pose-open']){
-  const el=hand.querySelector(sel);if(el){el.style.opacity='';el.style.transform='';}
+ for(const el of hand.querySelectorAll('.pose-rest,.pose-frame,.pose-shut,.pose-open')){
+  el.style.opacity='';el.style.transform='';
  }
 }
 function scheduleParkEddie(){requestAnimationFrame(()=>{parkEddieHand();requestAnimationFrame(parkEddieHand);});}
@@ -248,7 +314,11 @@ async function pour(token,{who,held,finals}){
   hand.style.left=(releaseV.x-root.left-hand.offsetWidth*px)+'px';
   hand.style.top=(releaseV.y-root.top-hand.offsetHeight*py)+'px';
  }
- const entryY=who==='eddie'?Math.min(-80,(felt.top-24)-releaseV.y):Math.max(110,(duel.bottom+16)-releaseV.y);
+ const handH=hand.offsetHeight;
+ const palmTop=releaseV.y-handH*py;
+ const entryY=who==='eddie'
+  ?Math.min(-80,(felt.top-24)-releaseV.y)
+  :Math.max(110, window.innerHeight+12-palmTop);
  const exitY=who==='eddie'?entryY-24:entryY+28;
  const T=POUR_MS,pending=[];
  const handKeys=who==='eddie'?[
@@ -269,16 +339,28 @@ async function pour(token,{who,held,finals}){
   {transform:`translate(0px,${exitY}px) rotate(8deg)`,opacity:0,offset:1}
  ];
  pending.push(hand.animate(handKeys,{duration:T,fill:'both',easing:'linear'}));
- const shut=hand.querySelector('.pose-shut'),open=hand.querySelector('.pose-open');
  const pose={duration:T,fill:'both',easing:'linear'};
+ const frames=[...hand.querySelectorAll('.pose-frame')].sort((a,b)=>(+a.dataset.frame)-(+b.dataset.frame));
+ const n=frames.length,holdShut=.16,openAt=.48,endHold=who==='eddie'?.84:1,eps=.002;
+ function stepKeys(start,end){
+  const keys=[];
+  if(start>0){keys.push({opacity:0,offset:0});if(start>eps)keys.push({opacity:0,offset:Math.max(0,start-eps)});}
+  keys.push({opacity:1,offset:start});
+  keys.push({opacity:1,offset:end});
+  if(end<1){keys.push({opacity:0,offset:Math.min(1,end+eps)});if(end+eps<1)keys.push({opacity:0,offset:1});}
+  return keys;
+ }
  if(who==='eddie'){
   const restPose=hand.querySelector('.pose-rest');
   if(restPose)pending.push(restPose.animate([{opacity:1,offset:0},{opacity:0,offset:.16},{opacity:0,offset:.84},{opacity:1,offset:1}],pose));
-  if(shut)pending.push(shut.animate([{opacity:0,offset:0},{opacity:1,offset:.16},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:.62},{opacity:1,offset:.84},{opacity:0,offset:1}],pose));
-  if(open)pending.push(open.animate([{opacity:0,offset:0},{opacity:0,offset:.2},{opacity:1,offset:.44},{opacity:1,offset:.62},{opacity:0,offset:.84},{opacity:0,offset:1}],pose));
- }else{
-  if(shut)pending.push(shut.animate([{opacity:1,offset:0},{opacity:1,offset:.22},{opacity:0,offset:.44},{opacity:0,offset:1}],pose));
-  if(open)pending.push(open.animate([{opacity:0,offset:0},{opacity:0,offset:.2},{opacity:1,offset:.44},{opacity:1,offset:1}],pose));
+ }
+ if(n){
+  const step=n>1?(openAt-holdShut)/(n-1):openAt-holdShut;
+  frames.forEach((el,i)=>{
+   const start=i===0?(who==='eddie'?holdShut:0):holdShut+i*step;
+   const end=i===n-1?endHold:holdShut+(i+1)*step;
+   pending.push(el.animate(stepKeys(start,end),pose));
+  });
  }
  loose.forEach(({el,i},order)=>{
   const rect=el.getBoundingClientRect();
@@ -316,34 +398,33 @@ async function pour(token,{who,held,finals}){
 }
 
 async function eddieTurn(token){
- clearTimeout(chatTimer);$('duel').classList.add('eddie-turn');state.held=Array(5).fill(false);renderDice();say('eddie','speaking');let dice=[],held=Array(5).fill(false);$('roll-counter').textContent='RZUT — / 3';
+ clearTimeout(chatTimer);$('duel').classList.add('eddie-turn');state.held=Array(5).fill(false);state.rolls=0;renderDice();say('eddie','speaking');let dice=[],held=Array(5).fill(false);$('roll-counter').textContent='RZUT — / 3';
  for(let n=1;n<=3;n++){
   await delay(n===1?650:750);if(token!==version)return;
-  dice=n===1?Array.from({length:5},randomDie):dice.map((v,i)=>held[i]?v:randomDie());try{await pour(token,{who:'eddie',held,finals:dice});}catch(_){}if(token!==version)return;state.eddieDice=dice;state.dice=dice;state.held=Array(5).fill(false);renderDice();renderMini(dice);landThrow(dice);
-  $('roll-counter').textContent=`RZUT ${n} / 3`;$('eddie-action').textContent=`Rzut ${n}/3 · Eddie przygląda się kościom…`;
-  say(E.score('yahtzee',dice)?'beast':classify(dice)==='great'?'eddieGreat':classify(dice)==='bad'?'eddieBad':'eddie');
+  dice=n===1?Array.from({length:5},randomDie):dice.map((v,i)=>held[i]?v:randomDie());try{await pour(token,{who:'eddie',held,finals:dice});}catch(_){}if(token!==version)return;state.eddieDice=dice;state.dice=dice;state.held=held.slice();state.rolls=n;renderDice();renderMini(dice,held);landThrow(dice);renderCard();
+  $('roll-counter').textContent=`RZUT ${n} / 3`;$('eddie-action').textContent=`Rzut ${n}/3 · Suma ${E.pipSum(dice)}. Eddie przygląda się kościom…`;
+  const kind=classify(dice);say(kind==='beast'?'beast':kind==='great'?'eddieGreat':kind==='bad'?'eddieBad':'eddie');
   if(n===3)break;
-  // Yield before calculating the one-roll expected-value strategy.
   await delay(80);if(token!==version)return;
-  const risk=Math.random()<.17;held=E.chooseHold(dice,state.eddie,risk);renderMini(dice,held);mood('thinking',0);await delay(350);if(token!==version)return;state.held=held.slice();renderDice();
-  if(held.every(Boolean))break;
-  const count=held.filter(Boolean).length;$('eddie-action').textContent=`Zatrzymuje ${count} z 5 kości. ${risk&&count>=3?'Ryzykuje dla wielkiego wyniku.':'Szuka lepszego układu.'}`;
-  if(risk&&count>=3)say('risk');
+  held=E.chooseHold(dice);renderMini(dice,held);mood('thinking',0);await delay(350);if(token!==version)return;state.held=held.slice();renderDice();
+  if(held.every(Boolean)){$('eddie-action').textContent=`Zatrzymuje wszystkie kości (suma ${E.pipSum(dice)}). Zapisuje serię.`;break;}
+  const count=held.filter(Boolean).length;$('eddie-action').textContent=count?`Zatrzymuje ${count} z 5 kości — wysokie oczka (4, 5 i 6).`:'Rzut ponownie wszystkimi. Szuka wyższych oczek.';
  }
  await delay(700);if(token!==version)return;
- const choice=E.chooseCategory(dice,state.eddie);state.eddie[choice.id]=choice.value;tableSound('stamp');$('duel').classList.remove('eddie-turn');renderMini(dice);
- $('eddie-action').textContent=`${E.categories.find(c=>c.id===choice.id).label}: ${choice.value} pkt · zapisane.`;renderCard();
- if(state.round===13){finish();return;}
- state.round++;state.turn='player';state.rolls=0;state.held=Array(5).fill(false);state.dice=[1,2,3,4,5];$('hint').textContent='Nowa runda. Rzuć wszystkimi pięcioma kośćmi.';mood('idle',0);render();scheduleChatter();
+ const idx=(state.series||1)-1;state.eddie[idx]=E.pipSum(dice);tableSound('stamp');$('duel').classList.remove('eddie-turn');renderMini(dice);
+ $('eddie-action').textContent=`Seria ${state.series}: ${state.eddie[idx]} pkt · zapisane.`;renderCard();
+ if(state.series>=3){finish();return;}
+ state.series++;state.turn='player';state.rolls=0;state.held=Array(5).fill(false);state.dice=[1,2,3,4,5];$('hint').textContent='Nowa seria. Rzuć wszystkimi pięcioma kośćmi.';mood('idle',0);render();scheduleChatter();
 }
 function finish(){
- clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');state.turn='finished';const p=E.totals(state.player).total,e=E.totals(state.eddie).total;const type=p>e?'win':p<e?'lose':'draw';const spoken=say(type);
- $('result-title').textContent=p>e?'Los uchylił ci kapelusza.':p<e?'Eddie zgarnia stawkę.':'Noc bez zwycięzcy.';$('result-quote').textContent='“'+spoken.text+'”';$('result-quote').lang=spoken.lang;
- $('result-totals').innerHTML=`<div><small>TY</small>${p}</div><span>:</span><div><small>EDDIE</small>${e}</div>`;
+ clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');state.turn='finished';const p=seriesSum('player'),e=seriesSum('eddie');const type=p>e?'win':p<e?'lose':'draw';const spoken=say(type);
+ $('result-title').textContent=p>e?'Los uchylił ci kapelusza.':p<e?'Eddie zgarnia stawkę.':'Remis. Noc bez zwycięzcy.';$('result-quote').textContent='“'+spoken.text+'”';$('result-quote').lang=spoken.lang;
+ const row=(who,label)=>`<div><small>${label}</small><span class="series-pips">${state[who].map(v=>v==null?'—':v).join(' + ')}</span><strong>${seriesSum(who)}</strong></div>`;
+ $('result-totals').innerHTML=row('player','TY')+'<span>:</span>'+row('eddie','EDDIE');
  $('result-petition').hidden=type!=='lose';
- $('hint').textContent='Pojedynek zakończony. Karta wyników pozostaje do wglądu.';render();$('result').showModal();
+ $('hint').textContent='Pojedynek zakończony. Tabela trzech serii pozostaje do wglądu.';render();$('result').showModal();
 }
-function newGame(){version++;rolling=false;clearThrow();stopTableSound();state={player:{},eddie:{},dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),round:1,rolls:0,turn:'player'};if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleParkEddie();scheduleChatter();}
+function newGame(){version++;rolling=false;clearThrow();stopTableSound();state={player:[null,null,null],eddie:[null,null,null],dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),series:1,rolls:0,turn:'player'};if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleParkEddie();scheduleChatter();}
 function updateIntroProgress(){
  const video=$('intro-video');
  const fraction=Number.isFinite(video.duration)&&video.duration>0?Math.min(1,Math.max(0,video.currentTime/video.duration)):0;
@@ -373,10 +454,12 @@ function startIntro(){
 $('intro-play').onclick=()=>{if(!$('intro').hidden&&!reduced())playIntro();};
 $('intro-video').addEventListener('ended',()=>{if(!$('intro').hidden)stopIntro();});
 ['timeupdate','durationchange','loadedmetadata','seeking','emptied'].forEach(event=>$('intro-video').addEventListener(event,updateIntroProgress));
-$('roll').onclick=playerRoll;$('new-game').onclick=newGame;$('result-new').onclick=newGame;$('result-close').onclick=()=>$('result').close();
+$('roll').onclick=playerRoll;if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=newGame;$('result-new').onclick=newGame;$('result-close').onclick=()=>$('result').close();
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
 $('sound').onclick=()=>{sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));if(sound)tableSound('hold');else stopTableSound();};
 $('skip-intro').onclick=stopIntro;$('replay-intro').onclick=startIntro;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('intro').hidden)stopIntro();});
 addEventListener('resize',()=>{if(!rolling){sizeDice();parkEddieHand();}});
 addEventListener('load',scheduleParkEddie);
 newGame();let seen=false;try{seen=sessionStorage.getItem('eddie-intro')==='seen';}catch(_){}if(seen){$('intro').hidden=true;}else startIntro();
+
+window.__throw=(who,finals)=>pour(version,{who,held:Array(5).fill(false),finals:finals||[5,4,3,6,2]});
