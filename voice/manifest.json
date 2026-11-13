@@ -1,0 +1,642 @@
+{
+  "en|Five little bones. Hear them argue.": {
+    "file": "voice/en-10f112c21d20.mp3",
+    "key": "rolling",
+    "bytes": 35569
+  },
+  "en|Don't blink. Fortune hates an audience.": {
+    "file": "voice/en-ef06a30b2a25.mp3",
+    "key": "rolling",
+    "bytes": 35987
+  },
+  "en|The table is listening.": {
+    "file": "voice/en-1a7f65486f39.mp3",
+    "key": "rolling",
+    "bytes": 19687
+  },
+  "en|Throw them like you mean the deal.": {
+    "file": "voice/en-67d3da31d64a.mp3",
+    "key": "rolling",
+    "bytes": 22403
+  },
+  "en|Listen — five verdicts in the air.": {
+    "file": "voice/en-c151519ebf89.mp3",
+    "key": "rolling",
+    "bytes": 27628
+  },
+  "en|The hat is watching the bounce.": {
+    "file": "voice/en-02acdc97e5e0.mp3",
+    "key": "rolling",
+    "bytes": 23239
+  },
+  "en|A gentleman never flinches at the rattle.": {
+    "file": "voice/en-fb967c1a492e.mp3",
+    "key": "rolling",
+    "bytes": 27001
+  },
+  "en|These bones remember every coward.": {
+    "file": "voice/en-834f9e967008.mp3",
+    "key": "rolling",
+    "bytes": 25956
+  },
+  "en|Let them dance. Then pick your truth.": {
+    "file": "voice/en-aa1fd62446a0.mp3",
+    "key": "rolling",
+    "bytes": 35569
+  },
+  "en|Keep what you trust. The rest can fall.": {
+    "file": "voice/en-8c1967b94361.mp3",
+    "key": "rolling",
+    "bytes": 35151
+  },
+  "en|The chair is yours. The odds are not.": {
+    "file": "voice/en-09fa4ab5ecc3.mp3",
+    "key": "welcome",
+    "bytes": 36405
+  },
+  "en|Five little bones. Let us see what they remember.": {
+    "file": "voice/en-10f4b580cb78.mp3",
+    "key": "welcome",
+    "bytes": 39540
+  },
+  "en|Now that is a hand worth haunting.": {
+    "file": "voice/en-3d04d358e8ef.mp3",
+    "key": "great",
+    "bytes": 24493
+  },
+  "en|The table trembles. I almost approve.": {
+    "file": "voice/en-e3eceae0ff35.mp3",
+    "key": "great",
+    "bytes": 36405
+  },
+  "en|You have put a crack in the darkness.": {
+    "file": "voice/en-0c0d9cd30ac4.mp3",
+    "key": "great",
+    "bytes": 24284
+  },
+  "en|Five faces, one verdict. Even the shadows stand to applaud.": {
+    "file": "voice/en-f83b68164ec1.mp3",
+    "key": "beast",
+    "bytes": 50616
+  },
+  "en|Every bone agrees. That is a dangerous kind of harmony.": {
+    "file": "voice/en-ee8097986b2a.mp3",
+    "key": "beast",
+    "bytes": 42883
+  },
+  "en|Such small numbers for such brave hands.": {
+    "file": "voice/en-40da4e0e83eb.mp3",
+    "key": "bad",
+    "bytes": 29927
+  },
+  "en|The dice heard your plan. They declined.": {
+    "file": "voice/en-9f77ba48af0c.mp3",
+    "key": "bad",
+    "bytes": 35151
+  },
+  "en|Careful. Hope is a very expensive habit.": {
+    "file": "voice/en-36c19c80395d.mp3",
+    "key": "bad",
+    "bytes": 36405
+  },
+  "en|Keep what you trust. Throw back what you fear.": {
+    "file": "voice/en-580831d2251f.mp3",
+    "key": "normal",
+    "bytes": 37032
+  },
+  "en|A steady hand can still carry a terrible idea.": {
+    "file": "voice/en-b2f6e6e3f14c.mp3",
+    "key": "normal",
+    "bytes": 32225
+  },
+  "en|Every little square has six ways to betray you.": {
+    "file": "voice/en-8d3474b37079.mp3",
+    "key": "normal",
+    "bytes": 31180
+  },
+  "en|Your fingers choose. The table remembers.": {
+    "file": "voice/en-27971eb012ff.mp3",
+    "key": "normal",
+    "bytes": 37032
+  },
+  "en|Every roll is a door. Some open onto stairs going down.": {
+    "file": "voice/en-2d7e9bf2c493.mp3",
+    "key": "normal",
+    "bytes": 45809
+  },
+  "en|Luck wears gloves. You never see her fingerprints.": {
+    "file": "voice/en-d79eeca0d59c.mp3",
+    "key": "normal",
+    "bytes": 41838
+  },
+  "en|My turn. Watch the hat, not the hands.": {
+    "file": "voice/en-a6df7867749a.mp3",
+    "key": "eddie",
+    "bytes": 39122
+  },
+  "en|A gentleman never argues with fate. He loads it with ambition.": {
+    "file": "voice/en-0ff515cded8f.mp3",
+    "key": "eddie",
+    "bytes": 45600
+  },
+  "en|These old bones still know a few tricks.": {
+    "file": "voice/en-412117219d06.mp3",
+    "key": "eddie",
+    "bytes": 28882
+  },
+  "en|Mind your fingers. These bones bite.": {
+    "file": "voice/en-08c3a917ae8e.mp3",
+    "key": "eddie",
+    "bytes": 35360
+  },
+  "en|Watch closely. I only cheat in stories.": {
+    "file": "voice/en-c07fec62e3df.mp3",
+    "key": "eddie",
+    "bytes": 38704
+  },
+  "en|A beautiful arrangement. Do not look so surprised.": {
+    "file": "voice/en-449b484f279d.mp3",
+    "key": "eddieGreat",
+    "bytes": 41838
+  },
+  "en|The table and I have an understanding.": {
+    "file": "voice/en-64f4bd2cb65f.mp3",
+    "key": "eddieGreat",
+    "bytes": 25120
+  },
+  "en|An ugly little offering. Even darkness has off nights.": {
+    "file": "voice/en-f079d9467859.mp3",
+    "key": "eddieBad",
+    "bytes": 43092
+  },
+  "en|I shall call that a rehearsal.": {
+    "file": "voice/en-532e8d275b89.mp3",
+    "key": "eddieBad",
+    "bytes": 21776
+  },
+  "en|Three bones agree. I want the other two to kneel.": {
+    "file": "voice/en-016b13cb7ab3.mp3",
+    "key": "risk",
+    "bytes": 40376
+  },
+  "en|A safe wager? How dreadfully forgettable.": {
+    "file": "voice/en-ba30978ee80e.mp3",
+    "key": "risk",
+    "bytes": 37241
+  },
+  "en|You have won the table. Enjoy the silence while it lasts.": {
+    "file": "voice/en-30e37c0883d7.mp3",
+    "key": "win",
+    "bytes": 43510
+  },
+  "en|Take your victory. I will keep the chair warm.": {
+    "file": "voice/en-bbdfb2d5f1ca.mp3",
+    "key": "win",
+    "bytes": 36405
+  },
+  "en|The last point is mine. Leave your excuses at the door.": {
+    "file": "voice/en-82e156718d9e.mp3",
+    "key": "lose",
+    "bytes": 42883
+  },
+  "en|Your courage was splendid. Your arithmetic was less fortunate.": {
+    "file": "voice/en-90153e965ea7.mp3",
+    "key": "lose",
+    "bytes": 43928
+  },
+  "en|A perfect deadlock. Neither shadow will bow tonight.": {
+    "file": "voice/en-8406ad6ea440.mp3",
+    "key": "draw",
+    "bytes": 41629
+  },
+  "en|Take your time. I have centuries, you have a candle.": {
+    "file": "voice/en-a4fe8ff58f15.mp3",
+    "key": "idle",
+    "bytes": 42256
+  },
+  "en|The hat is patient. The hat is always patient.": {
+    "file": "voice/en-b2f3b2cf43b2.mp3",
+    "key": "idle",
+    "bytes": 39749
+  },
+  "en|Your hand hovers like a moth near a flame.": {
+    "file": "voice/en-6a13d3fcc312.mp3",
+    "key": "idle",
+    "bytes": 29091
+  },
+  "en|I can hear you counting. Count louder.": {
+    "file": "voice/en-ddcf58586e02.mp3",
+    "key": "idle",
+    "bytes": 33897
+  },
+  "en|Somewhere a die is already laughing at you.": {
+    "file": "voice/en-d128e7efa239.mp3",
+    "key": "idle",
+    "bytes": 28673
+  },
+  "en|Lean closer. The table tells secrets to the brave.": {
+    "file": "voice/en-f6fdc5e31014.mp3",
+    "key": "idle",
+    "bytes": 42465
+  },
+  "en|Doubt is the sixth face of every die.": {
+    "file": "voice/en-de6656fa5499.mp3",
+    "key": "idle",
+    "bytes": 27210
+  },
+  "pl|Pięć małych kości. Posłuchaj, jak się spierają.": {
+    "file": "voice/pl-6a38b0a7a276.mp3",
+    "key": "rolling",
+    "bytes": 43301
+  },
+  "pl|Stół nadstawia ucha. Nie zawiedź go.": {
+    "file": "voice/pl-580f306b3ac1.mp3",
+    "key": "rolling",
+    "bytes": 37450
+  },
+  "pl|Cylinder czuwa nad każdym odbiciem.": {
+    "file": "voice/pl-fe09e5c52c3c.mp3",
+    "key": "rolling",
+    "bytes": 25538
+  },
+  "pl|Niech zatańczą. Potem wybierzesz, komu ufasz.": {
+    "file": "voice/pl-ec1d863f235a.mp3",
+    "key": "rolling",
+    "bytes": 42674
+  },
+  "pl|Rzuć odważnie. Wahanie nie daje punktów.": {
+    "file": "voice/pl-5a23c764a496.mp3",
+    "key": "rolling",
+    "bytes": 38913
+  },
+  "pl|Dżentelmen nie drży na dźwięk kości.": {
+    "file": "voice/pl-b6894e7fce04.mp3",
+    "key": "rolling",
+    "bytes": 26792
+  },
+  "pt|Cinco dados no ar. A mesa prende a respiração.": {
+    "file": "voice/pt-99aa52813455.mp3",
+    "key": "rolling",
+    "bytes": 40585
+  },
+  "es|Que rueden. El sombrero contará los rebotes.": {
+    "file": "voice/es-342f8668a2a6.mp3",
+    "key": "rolling",
+    "bytes": 38495
+  },
+  "ja|五つの骨が踊る。卓は静かに見守る。": {
+    "file": "voice/ja-babbc2f576d2.mp3",
+    "key": "rolling",
+    "bytes": 37241
+  },
+  "de|Lass sie tanzen. Der Tisch zählt jeden Schritt.": {
+    "file": "voice/de-c17074725338.mp3",
+    "key": "rolling",
+    "bytes": 36196
+  },
+  "fr|Cinq dés en voyage. La table attend leur récit.": {
+    "file": "voice/fr-d79cfa8bb421.mp3",
+    "key": "rolling",
+    "bytes": 36823
+  },
+  "pt|A sorte sussurra. Eu prefiro quando ela grita.": {
+    "file": "voice/pt-1a49eb4d4108.mp3",
+    "key": "normal",
+    "bytes": 38704
+  },
+  "pt|Cada dado guarda um segredo de seis faces.": {
+    "file": "voice/pt-92bd38f2f100.mp3",
+    "key": "normal",
+    "bytes": 30763
+  },
+  "es|Quien guarda un dado guarda una promesa.": {
+    "file": "voice/es-0526f92d25bc.mp3",
+    "key": "normal",
+    "bytes": 26583
+  },
+  "pl|Kość nie pamięta, ale stół tak.": {
+    "file": "voice/pl-f2c857903b8f.mp3",
+    "key": "normal",
+    "bytes": 26792
+  },
+  "ja|六つの面、六つの裏切り。": {
+    "file": "voice/ja-316758a47a9f.mp3",
+    "key": "normal",
+    "bytes": 25956
+  },
+  "de|Jeder Würfel hat sechs Arten zu lügen.": {
+    "file": "voice/de-6a697659db0d.mp3",
+    "key": "normal",
+    "bytes": 27837
+  },
+  "fr|Le destin roule, il ne marche jamais.": {
+    "file": "voice/fr-66042b7a4fbe.mp3",
+    "key": "normal",
+    "bytes": 25329
+  },
+  "es|La mesa recuerda cada duda.": {
+    "file": "voice/es-180456323bef.mp3",
+    "key": "normal",
+    "bytes": 22821
+  },
+  "pl|Nie każda odwaga mieści się w dłoni.": {
+    "file": "voice/pl-38ed64995eda.mp3",
+    "key": "normal",
+    "bytes": 25538
+  },
+  "ja|さあ、運命を卓上に投げてみろ。": {
+    "file": "voice/ja-f53efafb6925.mp3",
+    "key": "normal",
+    "bytes": 30136
+  },
+  "de|Der Tisch vergisst kein Zögern.": {
+    "file": "voice/de-0958b43cf117.mp3",
+    "key": "normal",
+    "bytes": 22612
+  },
+  "fr|Le hasard a des dents. Garde tes doigts.": {
+    "file": "voice/fr-efa3b2fa2a89.mp3",
+    "key": "normal",
+    "bytes": 31180
+  },
+  "pt|Até as sombras aplaudem essa mão.": {
+    "file": "voice/pt-1919f27a2c99.mp3",
+    "key": "great",
+    "bytes": 25747
+  },
+  "es|Hasta la oscuridad reconoce esa jugada.": {
+    "file": "voice/es-148435fd6e01.mp3",
+    "key": "great",
+    "bytes": 28464
+  },
+  "pl|Nawet cień uchyla przed tobą kapelusza.": {
+    "file": "voice/pl-ea718a05da45.mp3",
+    "key": "great",
+    "bytes": 27419
+  },
+  "ja|影さえ、その一投に頭を下げる。": {
+    "file": "voice/ja-ae727d995f3d.mp3",
+    "key": "great",
+    "bytes": 30554
+  },
+  "de|Selbst die Schatten verneigen sich.": {
+    "file": "voice/de-8bf131f60dc4.mp3",
+    "key": "great",
+    "bytes": 22821
+  },
+  "fr|Même les ombres saluent ce lancer.": {
+    "file": "voice/fr-b7c4f8db4ea8.mp3",
+    "key": "great",
+    "bytes": 23030
+  },
+  "pt|Tanta coragem para tão poucos pontos.": {
+    "file": "voice/pt-30420178fe45.mp3",
+    "key": "bad",
+    "bytes": 27628
+  },
+  "es|Tu esperanza pesa más que esos puntos.": {
+    "file": "voice/es-dbb4ef70f8cc.mp3",
+    "key": "bad",
+    "bytes": 27837
+  },
+  "pl|Wiele hałasu, niewiele oczek.": {
+    "file": "voice/pl-7d1ac814f195.mp3",
+    "key": "bad",
+    "bytes": 26792
+  },
+  "ja|勇気は立派だ。点数はどうかな。": {
+    "file": "voice/ja-0c74a548ad16.mp3",
+    "key": "bad",
+    "bytes": 34106
+  },
+  "de|Viel Mut. Erstaunlich wenig Punkte.": {
+    "file": "voice/de-66684f45ab72.mp3",
+    "key": "bad",
+    "bytes": 34106
+  },
+  "fr|Quel courage pour si peu de points.": {
+    "file": "voice/fr-a181c9534d7b.mp3",
+    "key": "bad",
+    "bytes": 22194
+  },
+  "pt|A vitória é tua. A cadeira fica à tua espera.": {
+    "file": "voice/pt-29e7cfb3c298.mp3",
+    "key": "win",
+    "bytes": 38913
+  },
+  "es|Has ganado. La mesa guardará tu nombre.": {
+    "file": "voice/es-fb62ee369e48.mp3",
+    "key": "win",
+    "bytes": 36405
+  },
+  "pl|Wygrałeś. Ten stół zapamięta twoją dłoń.": {
+    "file": "voice/pl-98371b992b1a.mp3",
+    "key": "win",
+    "bytes": 40585
+  },
+  "ja|お前の勝ちだ。この卓は覚えている。": {
+    "file": "voice/ja-7aa7de05da77.mp3",
+    "key": "win",
+    "bytes": 33688
+  },
+  "de|Du hast gewonnen. Der Tisch merkt sich deinen Namen.": {
+    "file": "voice/de-2ee93cdf83de.mp3",
+    "key": "win",
+    "bytes": 38704
+  },
+  "fr|Tu as gagné. La table retiendra ton nom.": {
+    "file": "voice/fr-3c2d8a159641.mp3",
+    "key": "win",
+    "bytes": 34106
+  },
+  "pt|O tempo corre, mas a mesa não tem pressa.": {
+    "file": "voice/pt-e6d0572ac8c8.mp3",
+    "key": "idle",
+    "bytes": 30972
+  },
+  "pt|Quem hesita alimenta a sorte.": {
+    "file": "voice/pt-6fb14430ce42.mp3",
+    "key": "idle",
+    "bytes": 21985
+  },
+  "es|El sombrero no tiene prisa. Yo tampoco.": {
+    "file": "voice/es-a663b533495a.mp3",
+    "key": "idle",
+    "bytes": 36823
+  },
+  "es|Cada duda es un dado más en mi mano.": {
+    "file": "voice/es-c4c12e540c35.mp3",
+    "key": "idle",
+    "bytes": 25747
+  },
+  "pl|Myśl szybciej, świeca nie będzie czekać.": {
+    "file": "voice/pl-09db2eee4c0c.mp3",
+    "key": "idle",
+    "bytes": 29300
+  },
+  "pl|Los lubi tych, którzy nie liczą na palcach.": {
+    "file": "voice/pl-de635bc5f0ea.mp3",
+    "key": "idle",
+    "bytes": 29927
+  },
+  "ja|迷う指ほど、よく震える。": {
+    "file": "voice/ja-88054776bc65.mp3",
+    "key": "idle",
+    "bytes": 25329
+  },
+  "ja|急げ。蝋燭は待ってくれない。": {
+    "file": "voice/ja-084992c3caed.mp3",
+    "key": "idle",
+    "bytes": 31180
+  },
+  "de|Zögern ist auch ein Wurf – nur ein schlechter.": {
+    "file": "voice/de-8d7d6537d337.mp3",
+    "key": "idle",
+    "bytes": 28882
+  },
+  "de|Mein Hut hat schon schlimmere Spieler gesehen.": {
+    "file": "voice/de-5f7f1abeab5d.mp3",
+    "key": "idle",
+    "bytes": 27837
+  },
+  "fr|Le chapeau attend. Il a l’habitude.": {
+    "file": "voice/fr-5da37bd92a5e.mp3",
+    "key": "idle",
+    "bytes": 31598
+  },
+  "fr|Chaque seconde perdue tombe dans ma poche.": {
+    "file": "voice/fr-92352fe06bbf.mp3",
+    "key": "idle",
+    "bytes": 26792
+  },
+  "pt|Agora os ossos falam por mim.": {
+    "file": "voice/pt-93bb1de1f142.mp3",
+    "key": "eddie",
+    "bytes": 22403
+  },
+  "es|Mira el sombrero, no las manos.": {
+    "file": "voice/es-2b8b6651aca9.mp3",
+    "key": "eddie",
+    "bytes": 26165
+  },
+  "pl|Teraz moja kolej. Patrz uważnie.": {
+    "file": "voice/pl-f3e31d34f8ce.mp3",
+    "key": "eddie",
+    "bytes": 35151
+  },
+  "ja|次は俺の番だ。目を離すなよ。": {
+    "file": "voice/ja-dd9ffa44d1ff.mp3",
+    "key": "eddie",
+    "bytes": 32852
+  },
+  "de|Jetzt spreche ich mit den Würfeln.": {
+    "file": "voice/de-5e7c6376f65e.mp3",
+    "key": "eddie",
+    "bytes": 23866
+  },
+  "fr|À moi. Les os connaissent ma voix.": {
+    "file": "voice/fr-1eea002f4a33.mp3",
+    "key": "eddie",
+    "bytes": 31180
+  },
+  "pt|A mesa e eu entendemo-nos bem.": {
+    "file": "voice/pt-4270466d282d.mp3",
+    "key": "eddieGreat",
+    "bytes": 23239
+  },
+  "es|La suerte me debe favores.": {
+    "file": "voice/es-16718c0f7071.mp3",
+    "key": "eddieGreat",
+    "bytes": 22194
+  },
+  "pl|Stół i ja dobrze się rozumiemy.": {
+    "file": "voice/pl-3177c39b7059.mp3",
+    "key": "eddieGreat",
+    "bytes": 24284
+  },
+  "ja|見ろ、骨が俺にひれ伏した。": {
+    "file": "voice/ja-c6154246aebe.mp3",
+    "key": "eddieGreat",
+    "bytes": 25329
+  },
+  "de|Das Glück kennt meinen Namen.": {
+    "file": "voice/de-13108e2acb08.mp3",
+    "key": "eddieGreat",
+    "bytes": 21985
+  },
+  "fr|La chance me doit quelques faveurs.": {
+    "file": "voice/fr-cb5c7f692415.mp3",
+    "key": "eddieGreat",
+    "bytes": 24493
+  },
+  "pt|Até os mortos têm noites más.": {
+    "file": "voice/pt-b28405ea72b5.mp3",
+    "key": "eddieBad",
+    "bytes": 25956
+  },
+  "es|Una noche floja, nada más.": {
+    "file": "voice/es-9794adeea406.mp3",
+    "key": "eddieBad",
+    "bytes": 25329
+  },
+  "pl|Nawet cienie mają gorsze noce.": {
+    "file": "voice/pl-7ead789cb043.mp3",
+    "key": "eddieBad",
+    "bytes": 24493
+  },
+  "ja|今のは稽古だ。": {
+    "file": "voice/ja-e1574e676602.mp3",
+    "key": "eddieBad",
+    "bytes": 17179
+  },
+  "de|Eine Probe, nichts weiter.": {
+    "file": "voice/de-0ae693897a18.mp3",
+    "key": "eddieBad",
+    "bytes": 24493
+  },
+  "fr|Simple répétition, rien de plus.": {
+    "file": "voice/fr-6bce300acb81.mp3",
+    "key": "eddieBad",
+    "bytes": 28046
+  },
+  "pt|A última palavra pertence aos meus dados.": {
+    "file": "voice/pt-d9f94c400176.mp3",
+    "key": "lose",
+    "bytes": 29300
+  },
+  "es|Mis dados han dicho la última palabra.": {
+    "file": "voice/es-336d801cf554.mp3",
+    "key": "lose",
+    "bytes": 26583
+  },
+  "pl|Ostatnie słowo należy do moich kości.": {
+    "file": "voice/pl-bf020a5731e4.mp3",
+    "key": "lose",
+    "bytes": 27419
+  },
+  "ja|最後の言葉は俺のサイコロが決めた。": {
+    "file": "voice/ja-7b8168a17f80.mp3",
+    "key": "lose",
+    "bytes": 28046
+  },
+  "de|Meine Würfel haben das letzte Wort.": {
+    "file": "voice/de-d548d0946537.mp3",
+    "key": "lose",
+    "bytes": 24911
+  },
+  "fr|Mes dés ont gardé le dernier mot.": {
+    "file": "voice/fr-371a2f3aed41.mp3",
+    "key": "lose",
+    "bytes": 21567
+  },
+  "en|Sign the petition.": {
+    "file": "voice/en-693524af4c81.mp3",
+    "key": "petition-sign",
+    "bytes": 18851
+  },
+  "en|Try again when you've signed the petition.": {
+    "file": "voice/en-bd23377b1d78.mp3",
+    "key": "petition-refuse",
+    "bytes": 25329
+  }
+}

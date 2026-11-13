@@ -54,6 +54,19 @@
 
 /* The petition is offered only after a loss; navigation is always voluntary. */
 #result-petition{border:1px solid #82613d77;background:#784d1a0c;padding:18px;margin:0 0 24px}#result-petition[hidden]{display:none}#result-petition p{margin-bottom:14px}#result-petition a{display:inline-block;text-decoration:none;min-width:0;line-height:1.5}
+.petition-stage{position:relative;margin:0 auto 12px;max-width:100%;background:#1a120c;border:1px solid #82613d77;overflow:hidden}
+#petition-clip{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#120c08;max-height:min(42vh,280px)}
+.petition-caption{position:absolute;left:0;right:0;bottom:0;margin:0;padding:10px 12px 12px;background:linear-gradient(transparent,#1a120cf2 55%);color:#f3d59e;font:italic 15px/1.3 Georgia,serif;text-shadow:0 1px 3px #000;pointer-events:none}
+.petition-url-line{font:11px/1.45 Arial,sans-serif;letter-spacing:.02em;word-break:break-all;color:#5a391d!important}
+.petition-url-line a{color:#5a391d;text-decoration:underline;text-underline-offset:2px}
+#petition-note{margin:4px 0 10px!important;font-size:12px}
+#petition-confirm{margin:0 0 4px;width:100%}
+#result #petition-confirm[hidden],#petition-note[hidden],#petition-play[hidden]{display:none!important}
+.petition-play{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;min-width:0}
+.petition-play[hidden]{display:none}
+#unlock-tick{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+/* While Eddie's throw flipbook runs, the resting table hand stays off the felt. */
+.eddie-fist.throwing .pose-rest{opacity:0!important}
 
 .eye-glow{display:none!important}
 

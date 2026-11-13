@@ -1,7 +1,7 @@
 /* Pure, dependency-free rules. Also usable from Node for verification. */
 (function(root) {
 'use strict';
-const SERIES=3, DICE=5, ROLLS=3;
+const SERIES=2, DICE=5, ROLLS=3;
 function pipSum(dice){return (dice||[]).reduce((a,b)=>a+b,0);}
 function totals(series){return (series||[]).reduce((s,v)=>s+(v||0),0);}
 // Hold dice already above the expected value of a reroll (3.5): 4, 5 and 6.
