@@ -43,8 +43,7 @@ function say(type,m) {
  $('quote').textContent='“'+text+'”';$('quote').lang=lang;
  const b=$('bubble');if(b){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
  mood(m||moodFor[type]||'speaking');
- // Rolling text stays on the banner; spoken audio waits until after the landing SFX.
- if(type!=='rolling')speakLine(lang,text);
+ // Rolling text stays on the banner. In-game lines are on-screen only — no spoken MP3s.
  return {text,lang};
 }
 function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(state.turn==='player'&&!rolling&&$('intro').hidden){say('idle');scheduleChatter();}},12000+Math.random()*6000);}
@@ -52,7 +51,7 @@ function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=22';
+const CACHE='?v=23';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -136,7 +135,6 @@ async function unlockAudio(){
  await tickHtmlUnlock();
  audioUnlocked=true;
  preloadSfx();
- loadVoiceManifest();
 }
 
 function armUnlock(){
@@ -147,9 +145,8 @@ function armUnlock(){
 }
 
 async function loadVoiceManifest(){
- if(voiceManifest)return voiceManifest;
- try{voiceManifest=await fetch('voice/manifest.json'+CACHE).then(r=>r.json());}
- catch(_){voiceManifest={};}
+ // v13: in-game theatrical lines are text-only. Do not fetch voice/ assets.
+ voiceManifest=voiceManifest||{};
  return voiceManifest;
 }
 
@@ -159,21 +156,8 @@ function stopVoice(){
 }
 
 function speakLine(lang,text){
+ // v13: theatrical lines stay on screen; spoken gameplay MP3s are not loaded.
  pendingVoice=null;
- if(!sound||!text)return;
- if($('intro')&&!$('intro').hidden)return;
- const play=()=>{
-  if(!sound)return;
-  loadVoiceManifest().then(man=>{
-   const rec=man&&man[lang+'|'+text];
-   if(!rec)return;
-   stopVoice();
-   playUrl(rec.file+CACHE,0.82,null).then(node=>{voiceNode=node;});
-  });
- };
- // Keep spoken lines off the rattle/clacks/landing of a throw still in flight.
- if(rolling||($('duel')&&$('duel').classList.contains('in-flight'))){pendingVoice=play;return;}
- play();
 }
 
 function flushVoice(){if(pendingVoice){const fn=pendingVoice;pendingVoice=null;fn();}}
@@ -659,7 +643,7 @@ if($('petition-link'))$('petition-link').addEventListener('click',()=>{markPetit
 if($('petition-confirm'))$('petition-confirm').onclick=()=>{markPetitionOpened();newGame();};
 addEventListener('resize',()=>{if(!rolling){sizeDice();parkEddieHand();}});
 addEventListener('load',scheduleParkEddie);
-armUnlock();loadVoiceManifest();
+armUnlock();
 newGame();let seen=false;try{seen=sessionStorage.getItem('eddie-intro')==='seen';}catch(_){}if(seen){$('intro').hidden=true;}else startIntro();
 
 window.__throw=(who,finals)=>pour(version,{who,held:Array(5).fill(false),finals:finals||[5,4,3,6,2]});
