@@ -13,9 +13,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1">
 <link rel="icon" href="favicon.ico?v=1" sizes="any">
-<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="style.css?v=19">
 <script src="tour-nations.js" defer></script><script src="tour.js" defer></script>
-<script src="engine.js?v=11" defer></script><script src="game.js?v=14" defer></script>
+<script src="engine.js?v=19" defer></script><script src="game.js?v=19" defer></script>
 </head>
 <body>
 <div id="intro" class="intro" aria-label="Filmowe wprowadzenie">
@@ -29,18 +29,9 @@
   <a class="wordmark" href="#" aria-label="Eddie's Dice of the Beast"><span>EDDIE'S</span><strong>DICE <i>of the</i> BEAST</strong><small>A GAME OF IRON AND CHANCE</small></a>
   <nav aria-label="Opcje gry"><button id="sound" class="icon-button" aria-pressed="false">Dźwięk: wył.</button><button id="rules-open" class="icon-button">Zasady</button><button id="new-game" class="outline">Nowa gra ↻</button></nav>
 </header>
-<section class="tour-parade" aria-label="Kraje i terytoria koncertów Iron Maiden">
-  <div class="tour-intro"><p class="eyebrow">ŚLADAMI KONCERTÓW</p><strong>59 miejsc. Jedna opowieść.</strong><small>Współczesne flagi · historyczne daty</small></div>
-  <div id="tour-card" class="tour-card">
-    <div class="tour-flag-frame"><img id="tour-flag" src="flags/us.svg" alt="Flaga: Stany Zjednoczone" width="84" height="56"></div>
-    <div class="tour-bill"><strong id="tour-country">Stany Zjednoczone</strong><small id="tour-caption">Pierwszy udokumentowany koncert</small><time id="tour-date" datetime="1981-06-03">03.06.1981</time></div>
-    <span id="tour-count" class="tour-count">01 / 59</span>
-  </div>
-  <div class="tour-controls"><div><button id="tour-prev" aria-label="Poprzedni kraj">‹</button><button id="tour-next" aria-label="Następny kraj">›</button></div><button id="tour-pause" aria-pressed="false">Zatrzymaj pochód</button><a id="tour-source" href="https://en.wikipedia.org/wiki/Killer_World_Tour" target="_blank" rel="noopener noreferrer">Źródło daty ↗</a></div>
-</section>
-<main>
+<main class="play" id="play">
   <section class="arena" aria-label="Stół gry">
-    <div class="table-top"><div><p class="eyebrow">POJEDYNEK O LOS</p><h1>Stół należy do odważnych.</h1></div><div class="round"><span>RUNDA</span><strong id="round">01 <em>/ 13</em></strong></div></div>
+    <div class="table-top"><div><p class="eyebrow">POJEDYNEK O LOS</p><h1>Trzy serie. Suma oczek.</h1></div><div class="round"><span>SERIA</span><strong id="round">01 <em>/ 3</em></strong></div></div>
     <div class="duel" id="duel">
       <div class="seat" aria-label="Eddie siedzi naprzeciwko ciebie">
         <div class="candle left" aria-hidden="true"></div><div class="candle right" aria-hidden="true"></div>
@@ -57,31 +48,51 @@
       </div>
       <div class="near-side">
         <p id="hint" class="hint" aria-live="polite">Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.</p>
-        <div class="roll-actions"><button id="roll" class="primary">Rzuć kośćmi <span>↗</span></button><span id="roll-note">Do 3 rzutów na turę</span></div>
+        <div class="roll-actions">
+          <button id="roll" class="primary">Rzuć kośćmi <span>↗</span></button>
+          <button id="save" class="outline save" disabled>Zapisz wynik</button>
+          <span id="roll-note">Pierwszy rzut wszystkimi, potem do dwóch poprawek</span>
+        </div>
       </div>
       </div>
       <div class="pour-hands" id="pour-hands" aria-hidden="true">
-        <div class="hand eddie-fist at-rest" id="eddie-fist" data-palm-x="0.40" data-palm-y="0.62">
-          <img class="hand-art pose pose-rest" src="assets/eddie-hand-rest.webp" alt="" width="964" height="594" draggable="false">
-          <img class="hand-art pose pose-shut" src="assets/eddie-hand-shut.webp" alt="" width="640" height="993" draggable="false">
-          <img class="hand-art pose pose-open" src="assets/eddie-hand-open.webp" alt="" width="640" height="993" draggable="false">
+        <div class="hand eddie-fist at-rest" id="eddie-fist" data-palm-x="0.42" data-palm-y="0.60">
+          <img class="hand-art pose pose-rest" src="assets/eddie-hand-rest.webp?v=19" alt="" width="964" height="594" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="0" src="assets/eddie-hand-f0.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="1" src="assets/eddie-hand-f1.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="2" src="assets/eddie-hand-f2.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="3" src="assets/eddie-hand-f3.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="4" src="assets/eddie-hand-f4.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="5" src="assets/eddie-hand-f5.webp?v=19" alt="" width="736" height="1121" draggable="false">
         </div>
-        <div class="hand player-hand" id="player-hand" data-palm-x="0.60" data-palm-y="0.38">
-          <img class="hand-art pose pose-shut" src="assets/eddie-hand-shut.webp" alt="" width="640" height="993" draggable="false">
-          <img class="hand-art pose pose-open" src="assets/eddie-hand-open.webp" alt="" width="640" height="993" draggable="false">
+        <div class="hand player-hand" id="player-hand" data-palm-x="0.58" data-palm-y="0.40">
+          <img class="hand-art pose pose-frame" data-frame="0" src="assets/player-hand-f0.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="1" src="assets/player-hand-f1.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="2" src="assets/player-hand-f2.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="3" src="assets/player-hand-f3.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="4" src="assets/player-hand-f4.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="5" src="assets/player-hand-f5.webp?v=19" alt="" width="736" height="1121" draggable="false">
         </div>
       </div>
     </div>
   </section>
-  <section class="scorecard" aria-labelledby="score-title">
-    <div class="score-heading"><div><p class="eyebrow">TRZYNAŚCIE DRÓG DO CHWAŁY</p><h2 id="score-title">Karta przeznaczenia</h2></div><span class="ornament" aria-hidden="true">✦</span></div>
-    <div class="scores-top"><div><span>TY</span><strong id="player-total">0</strong></div><span class="versus">VS</span><div><span>EDDIE</span><strong id="eddie-total">0</strong></div></div>
-    <p class="score-help">Po rzucie kliknij wolną kategorię w kolumnie „Ty”.</p>
-    <table><thead><tr><th scope="col">Kategoria</th><th scope="col">Ty</th><th scope="col">Eddie</th></tr></thead><tbody id="upper-rows"></tbody><tbody class="bonus-rows"><tr><th scope="row">Suma górna</th><td id="player-upper">0 / 63</td><td id="eddie-upper">0 / 63</td></tr><tr><th scope="row">Premia <small>≥ 63 → +35</small></th><td id="player-bonus">0</td><td id="eddie-bonus">0</td></tr></tbody><tbody id="lower-rows"></tbody><tfoot><tr><th scope="row">RAZEM</th><td id="player-footer">0</td><td id="eddie-footer">0</td></tr></tfoot></table>
-  </section>
+  <aside class="scorecard" aria-labelledby="score-title">
+    <div class="score-heading"><div><p class="eyebrow">TYLKO OCZKA</p><h2 id="score-title">Wynik pojedynku</h2></div></div>
+    <table class="series-table"><thead><tr><th scope="col"></th><th scope="col">S1</th><th scope="col">S2</th><th scope="col">S3</th><th scope="col">Suma</th></tr></thead><tbody><tr id="score-player"><th scope="row">Ty</th><td>—</td><td>—</td><td>—</td><td>0</td></tr><tr id="score-eddie"><th scope="row">Eddie</th><td>—</td><td>—</td><td>—</td><td>0</td></tr></tbody></table>
+    <p class="score-help" id="score-help">Suma oczek po ostatnim rzucie serii. Wyższa suma wygrywa.</p>
+  </aside>
 </main>
-<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro" class="outline" title="Osobny film promocyjny — zaproszenie do stołu">Obejrzyj intro ↗</button><span>5 KOŚCI · 13 RUND · ŻADNEJ LITOŚCI</span></footer>
+<section class="tour-parade" id="tour-parade" aria-label="Kraje i terytoria koncertów Iron Maiden">
+  <div class="tour-intro"><p class="eyebrow">ŚLADAMI KONCERTÓW</p><strong>59 miejsc. Jedna opowieść.</strong><small>Współczesne flagi · historyczne daty</small></div>
+  <div id="tour-card" class="tour-card">
+    <div class="tour-flag-frame"><img id="tour-flag" src="flags/us.svg" alt="Flaga: Stany Zjednoczone" width="84" height="56"></div>
+    <div class="tour-bill"><strong id="tour-country">Stany Zjednoczone</strong><small id="tour-caption">Pierwszy udokumentowany koncert</small><time id="tour-date" datetime="1981-06-03">03.06.1981</time></div>
+    <span id="tour-count" class="tour-count">01 / 59</span>
+  </div>
+  <div class="tour-controls"><div><button id="tour-prev" aria-label="Poprzedni kraj">‹</button><button id="tour-next" aria-label="Następny kraj">›</button></div><button id="tour-pause" aria-pressed="false">Zatrzymaj pochód</button><a id="tour-source" href="https://en.wikipedia.org/wiki/Killer_World_Tour" target="_blank" rel="noopener noreferrer">Źródło daty ↗</a></div>
+</section>
+<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro" class="outline" title="Osobny film promocyjny — zaproszenie do stołu">Obejrzyj intro ↗</button><a class="tour-jump" href="#tour-parade">Pochód flag ↗</a><span>5 KOŚCI · 3 SERIE · ŻADNEJ LITOŚCI</span></footer>
 </div>
-<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu przez 13 rund. Każdy z was raz w rundzie zapisuje wynik w jednej wolnej kategorii.</p><ol><li>Rzuć pięcioma kośćmi. Kliknij kości, aby je zatrzymać lub odblokować.</li><li>Możesz rzucić jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie kliknij kategorię na swojej karcie. Możesz wpisać także zero — decyzji nie da się cofnąć.</li><li>Eddie rozgrywa swoją turę. Po 13 rundach wygrywa wyższy wynik; równy wynik to remis.</li></ol><p><b>Góra:</b> suma wskazanych oczek. Zdobądź 63 punkty w górnej sekcji, a dostaniesz premię 35.</p><p><b>Trójka / kareta:</b> suma wszystkich kości, jeśli masz co najmniej 3 / 4 jednakowe. <b>Full:</b> dokładnie para i trójka, 25 pkt. <b>Mały strit:</b> co najmniej 4 kolejne wartości, 30 pkt. <b>Duży strit:</b> 5 kolejnych wartości, 40 pkt. <b>Generał:</b> 5 jednakowych, 50 pkt. <b>Szansa:</b> suma wszystkich kości.</p><p class="muted">Klasyczny zapis bez dodatkowych premii za kolejne Generały i bez reguły jokera. Podświetlone liczby pokazują bieżące możliwości, nie zapisany wynik. Przycisk „Dźwięk” steruje efektami dźwiękowymi stołu: grzechotem, stukami kości i zapisem wyniku. Intro to osobny film promocyjny z niezależnym, angielskim głosem lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
-<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><section id="result-petition" hidden><p>Przegrałeś. Podpisz petycję: umieść Eddiego w Madame Tussauds.</p><a class="primary" href="https://www.change.org/p/iron-maiden-eddie-to-wax" target="_blank" rel="noopener noreferrer">Podpisz petycję</a></section><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz kartę</button></dialog>
+<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu w trzech seriach. Liczą się tylko wyrzucone oczka. Wyższa suma wygrywa.</p><ol><li>W każdej serii najpierw rzuć wszystkimi pięcioma kośćmi.</li><li>Kliknij kości, aby je zatrzymać lub odznaczyć. Zatrzymane kości oznaczone są napisem „Zatrzymana”.</li><li>Możesz poprawić rzut jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie naciśnij „Zapisz wynik”, żeby zakończyć serię wcześniej. Po trzecim rzucie zapis jest jedynym ruchem.</li><li>Wynik serii to suma oczek na pięciu kościach. Eddie gra według tych samych zasad i zatrzymuje wysokie kości (4, 5 i 6).</li><li>Po trzech seriach wygrywa wyższa suma. Równy wynik to remis.</li></ol><p class="muted">Przycisk „Dźwięk” steruje efektami dźwiękowymi stołu: grzechotem, stukami kości i zapisem wyniku. Intro to osobny film promocyjny z niezależnym, angielskim głosem lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
+<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><section id="result-petition" hidden><p>Przegrałeś. Podpisz petycję: umieść Eddiego w Madame Tussauds.</p><a class="primary" href="https://www.change.org/p/iron-maiden-eddie-to-wax" target="_blank" rel="noopener noreferrer">Podpisz petycję</a></section><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz stół</button></dialog>
 </body></html>

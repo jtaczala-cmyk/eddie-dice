@@ -106,7 +106,7 @@
 .near-side{background:transparent;border-top:1px solid #efd7a633;margin-top:8px;padding:14px 8px 6px;border-radius:0}
 .near-side .hint{color:#f8ecd8;text-shadow:0 1px 2px #0008}
 .duel.in-flight .table-felt{box-shadow:inset 0 0 36px #ffb45a2a,inset 0 0 0 1px #f0d7a466,inset 0 18px 28px #0006}
-.duel.pour-player .near-side{box-shadow:inset 0 10px 18px #0004}
+.duel.pour-player .near-side{box-shadow:inset 0 10px 18px #0004}.duel.in-flight,.duel.in-flight .pour-hands{overflow:visible}.duel.in-flight .pour-hands{z-index:7}
 
 .die{padding:0;display:block;border:0;background:transparent;box-shadow:none;overflow:visible;transition:none;transform:rotate(var(--tilt,0deg));transform-origin:50% 50%}
 .die:hover:not(:disabled){filter:none}
@@ -125,16 +125,16 @@
 .die.pouring{z-index:4}
 .die.held{background:transparent}
 
-.pour-hands{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
-.hand{position:absolute;top:0;left:0;opacity:0;pointer-events:none;filter:drop-shadow(0 10px 8px #0008)}
+.pour-hands{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:visible}
+.hand{position:absolute;top:0;left:0;opacity:0;pointer-events:none;overflow:visible;filter:drop-shadow(0 10px 8px #0008)}
 .hand .hand-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.eddie-fist{width:min(300px,72%);aspect-ratio:640/993;opacity:1;z-index:6}.eddie-fist .pose-shut,.eddie-fist .pose-open,.eddie-fist .pose-rest{opacity:0}
-.eddie-fist.at-rest{width:min(140px,18%);aspect-ratio:964/594;height:auto;overflow:visible;z-index:5}
+.eddie-fist{width:min(300px,72%);aspect-ratio:736/1121;opacity:1;z-index:6}.eddie-fist .pose-shut,.eddie-fist .pose-open,.eddie-fist .pose-rest,.eddie-fist .pose-frame{opacity:0}
+.eddie-fist.at-rest{width:150px;aspect-ratio:964/594;height:auto;overflow:visible;z-index:5}
 .eddie-fist.at-rest .pose-rest{opacity:1;object-fit:contain}
-.eddie-fist.throwing .pose-shut{opacity:1}
-.player-hand{width:min(300px,72%);aspect-ratio:640/993;z-index:6}
+.eddie-fist.throwing .pose-frame[data-frame="0"]{opacity:1}
+.player-hand{width:min(300px,72%);aspect-ratio:736/1121;z-index:6}
 .player-hand .hand-art{transform:rotate(180deg)}
-.player-hand .pose-shut,.player-hand .pose-open{opacity:0}
+.player-hand .pose-shut,.player-hand .pose-open,.player-hand .pose-frame{opacity:0}
 .pose{opacity:0}
 .avatar[data-mood=watching]{animation:watchIt 1.15s ease}
 @keyframes watchIt{35%{transform:translateY(8px) scale(1.015)}70%{transform:translateY(3px)}}
@@ -143,13 +143,136 @@
 @media(max-width:720px){
   .table-board{margin:0 0 8px;padding:8px}
   .eddie-fist{width:min(280px,84vw)}
-  .eddie-fist.at-rest{width:min(136px,36vw);height:auto;aspect-ratio:964/594}
+  .eddie-fist.at-rest{width:116px;height:auto;aspect-ratio:964/594}
   .player-hand{width:min(280px,84vw)}
   .duel .dice-tray{padding-top:68px}
   .duel .table-felt{padding:12px 10px 10px}
 }
 @media(prefers-reduced-motion:reduce){
-  .player-hand,.player-hand .pose,.eddie-fist .pose-shut,.eddie-fist .pose-open{animation:none!important;opacity:0!important}
+  .player-hand,.player-hand .pose,.eddie-fist .pose-shut,.eddie-fist .pose-open,.eddie-fist .pose-frame{animation:none!important;opacity:0!important}
   .eddie-fist,.eddie-fist.at-rest .pose-rest{animation:none!important;opacity:1!important}
   .avatar[data-mood=watching],.avatar[data-mood=reaching]{animation:none!important}
 }
+
+/* --- v5: compact 3-series layout, table always in view --- */
+html{height:100%;}
+body{min-height:100%;}
+.app-shell{padding:0 2.4vw;max-width:1360px;}
+.masthead{padding:8px 0;gap:10px;align-items:center;}
+.wordmark>span{font-size:9px;letter-spacing:.28em;}
+.wordmark strong{font-size:18px;}
+.wordmark i{font-size:11px;}
+.wordmark small{font-size:6px;margin-top:2px;letter-spacing:.28em;}
+nav{gap:6px;}
+.outline,.icon-button{padding:6px 10px;font-size:11px;}
+main.play{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(220px,280px);gap:14px;padding:8px 0 10px;align-items:stretch;}
+.table-top{margin-bottom:8px;gap:8px;}
+.table-top h1{font-size:clamp(16px,1.6vw,22px);}
+.table-top .eyebrow{margin-bottom:3px;}
+.round strong{font-size:20px;}
+.round>span{margin-bottom:2px;}
+.seat{height:clamp(110px,18vh,170px);}
+.avatar .body{width:clamp(130px,16vh,200px);}
+.duel .speech{top:6px;right:2%;max-width:min(42%,260px);padding:7px 10px;}
+.duel .speech p{font-size:clamp(12px,1.1vw,15px);line-height:1.3;}
+.duel .table-felt{padding:8px 12px 8px;}
+.duel .dice-tray{padding:130px 0 22px;}
+.duel .eddie-hand{margin-top:2px;}
+.duel .eddie-hand p{font-size:11px;}
+.near-side{margin-top:4px;padding:8px 8px 6px;position:relative;}
+.near-side .hint{margin-bottom:6px;min-height:0;font-size:11px;}
+.roll-actions{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;align-items:center;position:relative;}
+.primary{padding:9px 16px;min-width:0;font-size:11px;}
+.primary span{margin-left:10px;}
+#save.save{min-width:0;padding:8px 14px;border-color:#c89d5e99;color:#f0d7a4;}
+#save.save.ready{background:linear-gradient(130deg,#cda565,#ab7840);color:#1e140e;border-color:#c89d5e;}
+#save.save:disabled{opacity:.35;}
+#roll-note{flex-basis:100%;text-align:center;margin:0;}
+.turn-line{gap:8px;}
+.live-sum{margin-left:auto;margin-right:10px;font:9px Arial,sans-serif;letter-spacing:.12em;color:#f0d7a4;}
+.scorecard{padding:12px 14px 10px;display:flex;flex-direction:column;justify-content:center;}
+.score-heading h2{font-size:18px;margin-bottom:8px;}
+.score-heading .eyebrow{margin-bottom:3px;}
+.series-table{width:100%;border-collapse:collapse;font-size:13px;color:#3a2414;}
+.series-table th,.series-table td{text-align:center;padding:6px 4px;height:auto;}
+.series-table thead th{font:8px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#715032;}
+.series-table tbody th{text-align:left;padding-left:2px;font-weight:normal;}
+.series-table td.current{background:#c89d5e33;box-shadow:inset 0 0 0 1px #c89d5e77;}
+.series-table td.recorded{font-weight:bold;}
+.series-table td.suma{font-size:16px;font-weight:bold;border-left:1px solid #67432255;}
+.series-table tr.active th{color:#5a391d;font-weight:bold;}
+.score-help{margin:8px 0 0;font-size:10px;}
+.tour-parade{margin-top:8px;margin-bottom:8px;}
+footer{padding:10px 0 14px;gap:10px;flex-wrap:wrap;}
+footer .tour-jump{color:#b0956c;text-decoration:none;font:10px Georgia,serif;padding:6px;}
+footer .tour-jump:hover{text-decoration:underline;}
+/* Hold label sits in the tray padding, not over the buttons */
+.duel .die.held{outline:2px solid #e3b357;outline-offset:3px;}
+.duel .die.held:after{content:'Zatrzymana';bottom:-16px;font:7px Arial,sans-serif;letter-spacing:.06em;color:#f0d7a4;text-transform:none;white-space:nowrap;}
+/* Stack on narrow screens, but keep the score in the first viewport */
+@media(max-width:900px){
+  main.play{grid-template-columns:1fr;gap:10px;padding:6px 0 8px;}
+  .scorecard{padding:10px 12px 8px;}
+}
+@media(max-width:720px){
+  .app-shell{padding:0 10px;}
+  .masthead{padding:6px 0;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;}
+  nav{width:auto;margin-left:auto;gap:4px;}
+  .wordmark strong{font-size:16px;}
+  .icon-button,.outline{padding:5px 8px;font-size:10px;}
+  .table-top{margin-bottom:6px;}
+  .table-top h1{font-size:16px;}
+  .seat{height:clamp(96px,16vh,140px);}
+  .avatar .body{width:clamp(120px,34vw,160px);}
+  .duel .speech{max-width:48%;padding:6px 8px;}
+  .duel .speech p{font-size:12px;}
+  .duel .table-felt{padding:8px 8px 6px;}
+  .duel .dice-tray{padding:102px 0 20px;gap:clamp(6px,2vw,12px);}
+  .duel .die{width:clamp(40px,11vw,56px);height:clamp(40px,11vw,56px);}
+  .hint{min-height:0;margin-bottom:4px;}
+  .roll-actions{gap:6px;}
+  .candle{display:none;}
+}
+/* Landscape phone / short viewports: side-by-side so the table stays on screen */
+@media(max-height:500px) and (orientation:landscape){
+  .app-shell{padding:0 8px;}
+  .masthead{padding:4px 0;}
+  .wordmark small,.table-top .eyebrow,.candle{display:none;}
+  .wordmark strong{font-size:14px;}
+  main.play{grid-template-columns:minmax(0,1fr) 200px;grid-template-rows:auto;gap:8px;padding:4px 0;}
+  .arena{display:grid;grid-template-columns:116px minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:6px 10px;}
+  .table-top{grid-column:1/-1;margin:0;}
+  .table-top h1{font-size:14px;}
+  .duel{grid-column:1/-1;display:grid;grid-template-columns:108px minmax(0,1fr);grid-template-rows:1fr auto;align-items:stretch;}
+  .seat{height:auto;min-height:0;grid-row:1;grid-column:1;align-items:center;}
+  .avatar .body{width:100px;}
+  .duel .speech{position:relative;top:auto;right:auto;max-width:none;margin:4px 2px 0;padding:4px 6px;border-radius:8px;}
+  .duel .speech:after{display:none;}
+  .duel .speech p{font-size:11px;}
+  .table-board{grid-column:2;grid-row:1/3;}
+  .pour-hands{grid-column:1/-1;grid-row:1/-1;}
+  .table-top{display:none;}
+  .duel .dice-tray{padding:112px 0 12px;}
+  .duel .die{width:40px;height:40px;}
+  .eddie-hand{display:none;}
+  .near-side{padding:4px 6px;}
+  .scorecard{padding:8px 10px;}
+  .series-table{font-size:12px;}
+  .tour-parade{margin-top:6px;}
+}
+@media(max-height:420px) and (orientation:landscape){
+  .duel .dice-tray{padding:108px 0 12px;}
+  .masthead{padding:2px 0;}
+  .table-top{display:none;}
+  .seat{display:flex;}
+  .avatar .body{width:84px;}
+  .duel .speech p{font-size:10px;}
+  .duel .die{width:34px;height:34px;}
+  .hint{font-size:10px;}
+  .primary,.save{padding:5px 10px;font-size:10px;}
+}
+.result-totals{align-items:stretch;gap:18px;font-size:20px;}
+.result-totals>div{min-width:132px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.result-totals .series-pips{font-size:16px;letter-spacing:.02em;}
+.result-totals strong{display:block;font-size:32px;margin-top:2px;}
+.live-sum{display:none;}
