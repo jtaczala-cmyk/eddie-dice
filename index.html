@@ -13,9 +13,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1">
 <link rel="icon" href="favicon.ico?v=1" sizes="any">
-<link rel="stylesheet" href="style.css?v=19">
+<link rel="stylesheet" href="style.css?v=22">
 <script src="tour-nations.js" defer></script><script src="tour.js" defer></script>
-<script src="engine.js?v=19" defer></script><script src="game.js?v=19" defer></script>
+<script src="engine.js?v=22" defer></script><script src="game.js?v=22" defer></script>
 </head>
 <body>
 <div id="intro" class="intro" aria-label="Filmowe wprowadzenie">
@@ -24,14 +24,15 @@
   <button id="skip-intro" class="outline">Pomiń intro i usiądź przy stole <span aria-hidden="true">↗</span></button>
   <div class="intro-progress" aria-hidden="true"></div>
 </div>
+<audio id="unlock-tick" src="sfx/silence.wav?v=22" playsinline preload="auto" aria-hidden="true"></audio>
 <div class="app-shell">
 <header class="masthead">
   <a class="wordmark" href="#" aria-label="Eddie's Dice of the Beast"><span>EDDIE'S</span><strong>DICE <i>of the</i> BEAST</strong><small>A GAME OF IRON AND CHANCE</small></a>
-  <nav aria-label="Opcje gry"><button id="sound" class="icon-button" aria-pressed="false">Dźwięk: wył.</button><button id="rules-open" class="icon-button">Zasady</button><button id="new-game" class="outline">Nowa gra ↻</button></nav>
+  <nav aria-label="Opcje gry"><button id="sound" class="icon-button" aria-pressed="true">Dźwięk: wł.</button><button id="rules-open" class="icon-button">Zasady</button><button id="new-game" class="outline">Nowa gra ↻</button></nav>
 </header>
 <main class="play" id="play">
   <section class="arena" aria-label="Stół gry">
-    <div class="table-top"><div><p class="eyebrow">POJEDYNEK O LOS</p><h1>Trzy serie. Suma oczek.</h1></div><div class="round"><span>SERIA</span><strong id="round">01 <em>/ 3</em></strong></div></div>
+    <div class="table-top"><div><p class="eyebrow">POJEDYNEK O LOS</p><h1>Dwie serie. Suma oczek.</h1></div><div class="round"><span>SERIA</span><strong id="round">01 <em>/ 2</em></strong></div></div>
     <div class="duel" id="duel">
       <div class="seat" aria-label="Eddie siedzi naprzeciwko ciebie">
         <div class="candle left" aria-hidden="true"></div><div class="candle right" aria-hidden="true"></div>
@@ -57,28 +58,28 @@
       </div>
       <div class="pour-hands" id="pour-hands" aria-hidden="true">
         <div class="hand eddie-fist at-rest" id="eddie-fist" data-palm-x="0.42" data-palm-y="0.60">
-          <img class="hand-art pose pose-rest" src="assets/eddie-hand-rest.webp?v=19" alt="" width="964" height="594" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="0" src="assets/eddie-hand-f0.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="1" src="assets/eddie-hand-f1.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="2" src="assets/eddie-hand-f2.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="3" src="assets/eddie-hand-f3.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="4" src="assets/eddie-hand-f4.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="5" src="assets/eddie-hand-f5.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-rest" src="assets/eddie-hand-rest.webp?v=22" alt="" width="964" height="594" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="0" src="assets/eddie-hand-f0.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="1" src="assets/eddie-hand-f1.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="2" src="assets/eddie-hand-f2.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="3" src="assets/eddie-hand-f3.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="4" src="assets/eddie-hand-f4.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="5" src="assets/eddie-hand-f5.webp?v=22" alt="" width="736" height="1121" draggable="false">
         </div>
         <div class="hand player-hand" id="player-hand" data-palm-x="0.58" data-palm-y="0.40">
-          <img class="hand-art pose pose-frame" data-frame="0" src="assets/player-hand-f0.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="1" src="assets/player-hand-f1.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="2" src="assets/player-hand-f2.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="3" src="assets/player-hand-f3.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="4" src="assets/player-hand-f4.webp?v=19" alt="" width="736" height="1121" draggable="false">
-          <img class="hand-art pose pose-frame" data-frame="5" src="assets/player-hand-f5.webp?v=19" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="0" src="assets/player-hand-f0.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="1" src="assets/player-hand-f1.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="2" src="assets/player-hand-f2.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="3" src="assets/player-hand-f3.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="4" src="assets/player-hand-f4.webp?v=22" alt="" width="736" height="1121" draggable="false">
+          <img class="hand-art pose pose-frame" data-frame="5" src="assets/player-hand-f5.webp?v=22" alt="" width="736" height="1121" draggable="false">
         </div>
       </div>
     </div>
   </section>
   <aside class="scorecard" aria-labelledby="score-title">
     <div class="score-heading"><div><p class="eyebrow">TYLKO OCZKA</p><h2 id="score-title">Wynik pojedynku</h2></div></div>
-    <table class="series-table"><thead><tr><th scope="col"></th><th scope="col">S1</th><th scope="col">S2</th><th scope="col">S3</th><th scope="col">Suma</th></tr></thead><tbody><tr id="score-player"><th scope="row">Ty</th><td>—</td><td>—</td><td>—</td><td>0</td></tr><tr id="score-eddie"><th scope="row">Eddie</th><td>—</td><td>—</td><td>—</td><td>0</td></tr></tbody></table>
+    <table class="series-table"><thead><tr><th scope="col"></th><th scope="col">S1</th><th scope="col">S2</th><th scope="col">Suma</th></tr></thead><tbody><tr id="score-player"><th scope="row">Ty</th><td>—</td><td>—</td><td>0</td></tr><tr id="score-eddie"><th scope="row">Eddie</th><td>—</td><td>—</td><td>0</td></tr></tbody></table>
     <p class="score-help" id="score-help">Suma oczek po ostatnim rzucie serii. Wyższa suma wygrywa.</p>
   </aside>
 </main>
@@ -91,8 +92,17 @@
   </div>
   <div class="tour-controls"><div><button id="tour-prev" aria-label="Poprzedni kraj">‹</button><button id="tour-next" aria-label="Następny kraj">›</button></div><button id="tour-pause" aria-pressed="false">Zatrzymaj pochód</button><a id="tour-source" href="https://en.wikipedia.org/wiki/Killer_World_Tour" target="_blank" rel="noopener noreferrer">Źródło daty ↗</a></div>
 </section>
-<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro" class="outline" title="Osobny film promocyjny — zaproszenie do stołu">Obejrzyj intro ↗</button><a class="tour-jump" href="#tour-parade">Pochód flag ↗</a><span>5 KOŚCI · 3 SERIE · ŻADNEJ LITOŚCI</span></footer>
+<footer><span>NIEOFICJALNY PROTOTYP FANOWSKI · BEZ AFILIACJI Z ZESPOŁEM</span><button id="replay-intro" class="outline" title="Osobny film promocyjny — zaproszenie do stołu">Obejrzyj intro ↗</button><a class="tour-jump" href="#tour-parade">Pochód flag ↗</a><span>5 KOŚCI · 2 SERIE · ŻADNEJ LITOŚCI</span></footer>
 </div>
-<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu w trzech seriach. Liczą się tylko wyrzucone oczka. Wyższa suma wygrywa.</p><ol><li>W każdej serii najpierw rzuć wszystkimi pięcioma kośćmi.</li><li>Kliknij kości, aby je zatrzymać lub odznaczyć. Zatrzymane kości oznaczone są napisem „Zatrzymana”.</li><li>Możesz poprawić rzut jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie naciśnij „Zapisz wynik”, żeby zakończyć serię wcześniej. Po trzecim rzucie zapis jest jedynym ruchem.</li><li>Wynik serii to suma oczek na pięciu kościach. Eddie gra według tych samych zasad i zatrzymuje wysokie kości (4, 5 i 6).</li><li>Po trzech seriach wygrywa wyższa suma. Równy wynik to remis.</li></ol><p class="muted">Przycisk „Dźwięk” steruje efektami dźwiękowymi stołu: grzechotem, stukami kości i zapisem wyniku. Intro to osobny film promocyjny z niezależnym, angielskim głosem lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
-<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><section id="result-petition" hidden><p>Przegrałeś. Podpisz petycję: umieść Eddiego w Madame Tussauds.</p><a class="primary" href="https://www.change.org/p/iron-maiden-eddie-to-wax" target="_blank" rel="noopener noreferrer">Podpisz petycję</a></section><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz stół</button></dialog>
+<dialog id="rules"><button class="close-dialog" aria-label="Zamknij zasady">×</button><p class="eyebrow">ZANIM LOS ZAPUKA</p><h2>Zasady pojedynku</h2><p>Grasz przeciwko Eddiemu w dwóch seriach. Liczą się tylko wyrzucone oczka. Wyższa suma wygrywa.</p><ol><li>W każdej serii najpierw rzuć wszystkimi pięcioma kośćmi.</li><li>Kliknij kości, aby je zatrzymać lub odznaczyć. Zatrzymane kości oznaczone są napisem „Zatrzymana”.</li><li>Możesz poprawić rzut jeszcze dwukrotnie, tylko niezatrzymanymi kośćmi.</li><li>Po dowolnym rzucie naciśnij „Zapisz wynik”, żeby zakończyć serię wcześniej. Po trzecim rzucie zapis jest jedynym ruchem.</li><li>Wynik serii to suma oczek na pięciu kościach. Eddie gra według tych samych zasad i zatrzymuje wysokie kości (4, 5 i 6).</li><li>Po dwóch seriach wygrywa wyższa suma. Równy wynik to remis.</li></ol><p class="muted">Przycisk „Dźwięk” steruje efektami stołu, głosem Eddiego i klipami po przegranej. Dźwięk jest włączony od początku. Intro to osobny film promocyjny z niezależnym, angielskim głosem lektora.</p><button class="primary close-dialog">Do stołu</button></dialog>
+<dialog id="result"><p class="eyebrow">OSTATNIA KOŚĆ UPADŁA</p><h2 id="result-title"></h2><p id="result-quote"></p><div class="result-totals" id="result-totals"></div><section id="result-petition" hidden>
+  <div class="petition-stage">
+    <video id="petition-clip" playsinline webkit-playsinline preload="auto"></video>
+    <button type="button" id="petition-play" class="primary petition-play" hidden>Posłuchaj Eddiego</button>
+    <p id="petition-caption" class="petition-caption">Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!</p>
+  </div>
+  <p class="petition-url-line">Petycja: <a id="petition-link" href="https://www.change.org/p/iron-maiden-eddie-to-wax" target="_blank" rel="noopener noreferrer">https://www.change.org/p/iron-maiden-eddie-to-wax</a></p>
+  <p id="petition-note" class="muted" hidden>Nie sprawdzamy, czy petycja została podpisana. Otwórz odnośnik albo potwierdź poniżej, a potem możesz zagrać ponownie.</p>
+  <button type="button" id="petition-confirm" class="outline" hidden>Otworzyłem petycję — zagraj ponownie</button>
+</section><button id="result-new" class="primary">Jeszcze jeden pojedynek ↗</button><button id="result-close" class="outline">Zobacz stół</button></dialog>
 </body></html>
