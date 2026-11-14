@@ -51,7 +51,7 @@ function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=23';
+const CACHE='?v=24';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -202,18 +202,27 @@ function resetPetitionUi(){
 function playPetitionClip(which){
  const clip=$('petition-clip'),play=$('petition-play'),cap=$('petition-caption');
  if(!clip)return;
- const file=which==='refuse'?'intro/v12-refuse.mp4'+CACHE:'intro/v12-loss.mp4'+CACHE;
+ const base=which==='refuse'?'intro/v12-refuse':'intro/v12-loss';
  if(cap)cap.textContent=which==='refuse'?'Spróbuj, kiedy podpiszesz petycję':'Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!';
  try{clip.pause();}catch(_){}
- clip.src=file;clip.muted=!sound;clip.playsInline=true;
- const tryPlay=()=>{
-  const p=clip.play();
-  if(p&&p.catch)p.catch(()=>{if(play)play.hidden=false;});
-  else if(play)play.hidden=true;
- };
- clip.onended=()=>{if(play)play.hidden=true;};
- if(clip.readyState>=2)tryPlay();else clip.onloadeddata=tryPlay;
- if(play)play.onclick=()=>{play.hidden=true;unlockAudio();clip.muted=!sound;clip.play().catch(()=>{});};
+ clip.setAttribute('playsinline','');clip.setAttribute('webkit-playsinline','');clip.playsInline=true;
+ clip.poster=base+'-poster.jpg'+CACHE;
+ clip.src=base+'.mp4'+CACHE;
+ try{clip.load();}catch(_){}
+ if(play){play.hidden=true;play.textContent='Posłuchaj Eddiego';}
+ clip.onended=()=>{if(play){play.hidden=false;play.textContent='Odtwórz jeszcze raz';}};
+ // iOS: unmuted play() outside a tap is refused; start muted so the
+ // animation always runs, and offer a tap to restart it with sound.
+ clip.muted=!sound;
+ const p=clip.play();
+ if(p&&p.catch)p.catch(()=>{
+  clip.muted=true;
+  const q=clip.play();
+  if(sound&&play)play.hidden=false;
+  if(q&&q.catch)q.catch(()=>{if(play)play.hidden=false;});
+ });
+ if(sound&&play)setTimeout(()=>{if(clip.muted&&!clip.ended)play.hidden=false;},400);
+ if(play)play.onclick=()=>{play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}clip.play().catch(()=>{play.hidden=false;});};
 }
 
 function showLossPetition(){
