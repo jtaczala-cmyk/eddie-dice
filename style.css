@@ -324,3 +324,22 @@ footer .tour-jump:hover{text-decoration:underline;}
 #result.eddie-full .petition-stage:after{background:radial-gradient(ellipse at 50% 45%,transparent 50%,#08060499 85%,#080604cc 100%),linear-gradient(#080604bb,transparent 16%,transparent 80%,#080604 100%)}
 #result.eddie-full #result-title{margin-top:10px}
 @media(min-width:900px) and (orientation:landscape){#result.eddie-full #petition-clip{object-fit:contain;object-position:50% 50%}#result.eddie-full .petition-stage:after{background:radial-gradient(ellipse at 50% 50%,transparent 55%,#080604 90%),linear-gradient(transparent 82%,#080604)}#result.eddie-full .result-totals{margin:4px auto 8px;padding:6px 0}#result.eddie-full .result-totals strong{font-size:24px}#result.eddie-full .petition-cta{padding:12px 20px}}
+/* v16: phone landscape - clip on the left, panel on the right. */
+@media(orientation:landscape) and (max-height:560px){
+#result.eddie-full{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr);grid-auto-rows:min-content;align-content:center;column-gap:0;padding:0 max(14px,env(safe-area-inset-right)) 0 0}
+#result.eddie-full .petition-stage{grid-column:1;grid-row:1 / span 20;height:100vh;height:100dvh;align-self:stretch}
+#result.eddie-full #petition-clip{object-fit:cover;object-position:50% 35%}
+#result.eddie-full .petition-stage:after{background:radial-gradient(ellipse at 50% 40%,transparent 50%,#080604aa 90%),linear-gradient(90deg,transparent 70%,#080604)}
+#result.eddie-full .petition-caption{font-size:16px;top:max(12px,env(safe-area-inset-top));padding:0 14px}
+#result.eddie-full>*:not(#result-petition),#result.eddie-full #result-petition>*:not(.petition-stage){grid-column:2;width:calc(100% - 20px);margin-left:auto;margin-right:auto}
+#result.eddie-full #result-title{font-size:20px;margin:0 0 2px}
+#result.eddie-full .result-totals{margin:4px auto 8px;padding:5px 0;font-size:12px}
+#result.eddie-full .result-totals .series-pips{font-size:11px}
+#result.eddie-full .result-totals strong{font-size:22px;line-height:1.1}
+#result.eddie-full .petition-cta{padding:11px 12px;font-size:12px;margin-bottom:5px}
+#result.eddie-full .petition-url-line{font-size:9px;margin-bottom:5px!important}
+#result.eddie-full #petition-note{font-size:10px;line-height:1.35;margin-bottom:4px!important}
+#result.eddie-full #petition-confirm{padding:7px 10px;font-size:11px;margin-bottom:4px}
+#result.eddie-full #result-new{padding:10px 12px;font-size:11px}
+#result.eddie-full #result-close{margin:2px auto 0;padding:6px}
+}
