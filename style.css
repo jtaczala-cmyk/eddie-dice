@@ -343,3 +343,28 @@ footer .tour-jump:hover{text-decoration:underline;}
 #result.eddie-full #result-new{padding:10px 12px;font-size:11px}
 #result.eddie-full #result-close{margin:2px auto 0;padding:6px}
 }
+
+/* v19: end board after Eddie's clip - video fades out, score + petition link take the screen. */
+.petition-replay{display:none}
+#result.eddie-full #petition-clip,#result.eddie-full .petition-caption{transition:opacity .6s ease}
+#result.eddie-full.clip-fading #petition-clip,#result.eddie-full.clip-fading .petition-caption,#result.eddie-full.clip-fading .petition-stage:after{opacity:0}
+#result.eddie-full.clip-board{justify-content:center;align-content:center}
+#result.eddie-full.clip-board .petition-stage{display:none}
+#result.eddie-full.clip-board>.eyebrow{display:block;margin:0 auto 6px;color:#b79a70;letter-spacing:.2em}
+#result.eddie-full.clip-board>*:not(#result-petition),#result.eddie-full.clip-board #result-petition>*:not(.petition-stage){animation:boardIn .55s ease both}
+#result.eddie-full.clip-board #result-title{font-size:clamp(26px,6.4vw,40px);margin:0 18px 8px}
+#result.eddie-full.clip-board .result-totals{margin:8px auto 18px}
+#result.eddie-full.clip-board .petition-cta{padding:20px 22px;font-size:16px;margin-bottom:10px}
+#result.eddie-full .petition-replay:not([hidden]){display:block;width:min(520px,calc(100% - 40px));margin:0 auto 8px;color:#e3cfab;border-color:#c8995077;background:transparent}
+@keyframes boardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(orientation:landscape) and (max-height:560px){
+#result.eddie-full.clip-board{grid-template-columns:minmax(0,1fr);padding:0 max(14px,env(safe-area-inset-right)) 0 max(14px,env(safe-area-inset-left))}
+#result.eddie-full.clip-board>*:not(#result-petition),#result.eddie-full.clip-board #result-petition>*:not(.petition-stage){grid-column:1;width:min(520px,calc(100% - 20px))}
+#result.eddie-full.clip-board #result-title{font-size:22px;margin:0 auto 4px;text-align:center}
+#result.eddie-full.clip-board .result-totals{margin:4px auto 8px}
+#result.eddie-full.clip-board .petition-cta{padding:13px 14px;font-size:13px;margin-bottom:6px}
+#result.eddie-full.clip-board>.eyebrow{margin-bottom:2px;font-size:10px}
+#result.eddie-full .petition-replay:not([hidden]){padding:8px 10px;font-size:11px;margin-bottom:5px}
+}
+@media(prefers-reduced-motion:reduce){#result.eddie-full #petition-clip,#result.eddie-full .petition-caption{transition:none}#result.eddie-full.clip-board *{animation:none!important}}
+#result.eddie-full.clip-board #result-title{text-align:center}

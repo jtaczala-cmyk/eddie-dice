@@ -51,7 +51,7 @@ function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=26';
+const CACHE='?v=29';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -190,7 +190,7 @@ function petitionOpened(){try{return sessionStorage.getItem('eddie-petition-open
 function markPetitionOpened(){try{sessionStorage.setItem('eddie-petition-opened','1');}catch(_){}}
 
 function resetPetitionUi(){
- petitionPhase=null;if($('result'))$('result').classList.remove('eddie-full');
+ petitionPhase=null;clearBoard();if($('result'))$('result').classList.remove('eddie-full');
  const clip=$('petition-clip'),play=$('petition-play'),note=$('petition-note'),confirm=$('petition-confirm'),cap=$('petition-caption');
  if(clip){try{clip.pause();clip.removeAttribute('src');clip.load();}catch(_){}}
  if(play)play.hidden=true;
@@ -199,10 +199,17 @@ function resetPetitionUi(){
  if(cap)cap.textContent='Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!';
 }
 
+// v19: when Eddie's clip ends, fade the video out and show a clean end board
+// (score + petition link + replay), instead of holding the last frame.
+let boardTimer=null;
+function clearBoard(){clearTimeout(boardTimer);const r=$('result');if(r)r.classList.remove('clip-fading','clip-board');const rp=$('petition-replay');if(rp)rp.hidden=true;}
+function showBoard(){const r=$('result');if(!r||!r.classList.contains('eddie-full'))return;clearTimeout(boardTimer);r.classList.add('clip-fading');const play=$('petition-play');if(play)play.hidden=true;boardTimer=setTimeout(()=>{r.classList.add('clip-board');const rp=$('petition-replay');if(rp)rp.hidden=false;},620);}
+function replayPetitionClip(){const clip=$('petition-clip'),play=$('petition-play');if(!clip)return;clearBoard();if(play)play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}clip.play().catch(()=>{clip.muted=true;clip.play().catch(()=>{});if(play&&sound)play.hidden=false;});}
+
 function playPetitionClip(which){
  const clip=$('petition-clip'),play=$('petition-play'),cap=$('petition-caption');
  if(!clip)return;
- const base=which==='refuse'?'intro/v12-refuse':'intro/v12-loss';
+ const base=which==='refuse'?'intro/v19-refuse':'intro/v19-loss';
  if(cap)cap.textContent=which==='refuse'?'Spróbuj, kiedy podpiszesz petycję':'Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!';
  try{clip.pause();}catch(_){}
  clip.setAttribute('playsinline','');clip.setAttribute('webkit-playsinline','');clip.playsInline=true;
@@ -210,7 +217,8 @@ function playPetitionClip(which){
  clip.src=base+'.mp4'+CACHE;
  try{clip.load();}catch(_){}
  if(play){play.hidden=true;play.textContent='Posłuchaj Eddiego';}
- clip.onended=()=>{if(play){play.hidden=false;play.textContent='Odtwórz jeszcze raz';}};
+ clearBoard();
+ clip.onended=showBoard;
  // iOS: unmuted play() outside a tap is refused; start muted so the
  // animation always runs, and offer a tap to restart it with sound.
  clip.muted=!sound;
@@ -223,6 +231,7 @@ function playPetitionClip(which){
  });
  if(sound&&play)setTimeout(()=>{if(clip.muted&&!clip.ended)play.hidden=false;},400);
  if(play)play.onclick=()=>{play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}clip.play().catch(()=>{play.hidden=false;});};
+ const rp=$('petition-replay');if(rp)rp.onclick=replayPetitionClip;
 }
 
 function showLossPetition(){
@@ -644,7 +653,7 @@ function startIntro(){
 $('intro-play').onclick=()=>{unlockAudio();if(!$('intro').hidden&&!reduced())playIntro();};
 $('intro-video').addEventListener('ended',()=>{if(!$('intro').hidden)stopIntro();});
 ['timeupdate','durationchange','loadedmetadata','seeking','emptied'].forEach(event=>$('intro-video').addEventListener(event,updateIntroProgress));
-$('roll').onclick=()=>{unlockAudio();playerRoll();};if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=requestNewGame;$('result-new').onclick=requestNewGame;$('result-close').onclick=()=>{const c=$('petition-clip');if(c){try{c.pause();}catch(_){}}$('result').close();};
+$('roll').onclick=()=>{unlockAudio();playerRoll();};if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=requestNewGame;$('result-new').onclick=requestNewGame;$('result-close').onclick=()=>{const c=$('petition-clip');if(c){try{c.pause();}catch(_){}}clearBoard();$('result').close();};
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
 $('sound').onclick=()=>{unlockAudio();sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));const clip=$('petition-clip');if(clip)clip.muted=!sound;if(sound)tableSound('hold');else stopTableSound();};
 $('skip-intro').onclick=()=>{unlockAudio();stopIntro();};$('replay-intro').onclick=startIntro;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('intro').hidden)stopIntro();});
