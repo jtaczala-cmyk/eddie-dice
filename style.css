@@ -289,3 +289,38 @@ footer .tour-jump:hover{text-decoration:underline;}
 .result-totals .series-pips{font-size:16px;letter-spacing:.02em;}
 .result-totals strong{display:block;font-size:32px;margin-top:2px;}
 .live-sum{display:none;}
+/* v15: after a loss Eddie fills the screen; score and petition sit in a bottom panel. */
+#result.eddie-full{position:fixed;inset:0;margin:0;width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;padding:0;border:0;background:#080604;color:#ecd6ad;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;box-shadow:none;text-align:center}
+#result.eddie-full::backdrop{background:#080604}
+#result.eddie-full>.eyebrow,#result.eddie-full #result-quote{display:none}
+#result.eddie-full #result-petition{position:static;border:0;background:none;padding:0;margin:0;display:contents}
+#result.eddie-full .petition-stage{position:absolute;inset:0;margin:0;border:0;z-index:0;background:#080604}
+#result.eddie-full #petition-clip{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:cover;object-position:50% 38%;filter:sepia(.12) contrast(1.05)}
+#result.eddie-full .petition-stage:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,transparent 38%,#080604aa 78%,#080604 100%),linear-gradient(#080604cc,transparent 18%,transparent 48%,#080604ee 74%,#080604)}
+#result.eddie-full .petition-caption{position:absolute;top:max(22px,env(safe-area-inset-top));bottom:auto;left:0;right:0;z-index:2;background:none;padding:0 22px;font:italic clamp(18px,4.6vw,28px)/1.3 Georgia,serif;color:#f3d59e;letter-spacing:.01em;text-shadow:0 2px 10px #000,0 0 2px #000}
+#result.eddie-full .petition-play{z-index:3;top:50%}
+#result.eddie-full>*:not(#result-petition),#result.eddie-full #result-petition>*:not(.petition-stage){position:relative;z-index:1}
+#result.eddie-full #result-title{font-size:clamp(22px,5.4vw,34px);margin:0 18px 4px;color:#f0d9ae;text-shadow:0 2px 12px #000}
+#result.eddie-full .result-totals{margin:6px auto 12px;padding:10px 0;width:min(520px,calc(100% - 40px));border-block:1px solid #c8995055;color:#ecd6ad;font-size:15px;gap:10px}
+#result.eddie-full .result-totals>div{min-width:0;flex:1}
+#result.eddie-full .result-totals small{color:#b79a70}
+#result.eddie-full .result-totals .series-pips{font-size:13px;color:#c9ad80}
+#result.eddie-full .result-totals strong{font-size:30px;color:#f3d59e}
+#result.eddie-full .petition-url-line{margin:0 auto 8px!important;width:min(520px,calc(100% - 40px));color:#b79a70!important;font-size:10px}
+#result.eddie-full .petition-url-line a{color:#d9bb88}
+.petition-cta{display:none}
+#result.eddie-full .petition-cta{display:block;margin:0 auto 8px;width:min(520px,calc(100% - 40px));text-decoration:none;text-align:center;padding:16px 20px;font:bold 14px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#1e140e;border:1px solid #e2b46a;background:linear-gradient(130deg,#e4bd78,#b07c41);box-shadow:0 0 28px #c8995055,inset 0 0 0 3px #21160d33;animation:ctaPulse 2.4s ease-in-out infinite}
+@keyframes ctaPulse{50%{box-shadow:0 0 44px #e0a95299,inset 0 0 0 3px #21160d33}}
+#result.eddie-full #petition-note{margin:0 auto 6px!important;width:min(520px,calc(100% - 40px));color:#b79a70;font-size:11px}
+#result.eddie-full #petition-confirm{width:min(520px,calc(100% - 40px));margin:0 auto 6px;color:#e3cfab;border-color:#c8995077}
+#result.eddie-full .result-bottom{display:flex}
+#result.eddie-full #result-new{display:block;margin:0 auto;width:min(520px,calc(100% - 40px));min-width:0;background:transparent;color:#ecd6ad;border:1px solid #c8995099;box-shadow:none}
+#result.eddie-full #result-close{width:min(520px,calc(100% - 40px));margin:6px auto max(14px,env(safe-area-inset-bottom));color:#b79a70;border-color:transparent}
+@media(min-width:900px) and (orientation:landscape){#result.eddie-full #petition-clip{object-fit:contain;object-position:50% 40%}#result.eddie-full .petition-stage:after{background:radial-gradient(ellipse at 50% 40%,transparent 45%,#080604 85%),linear-gradient(transparent 55%,#080604ee 80%,#080604)}}
+/* v15b: Eddie's stage takes the space above the panel, so nothing covers his mouth. */
+#result.eddie-full{justify-content:flex-start}
+#result.eddie-full .petition-stage{position:relative;inset:auto;order:-1;flex:1 1 auto;min-height:0;width:100%}
+#result.eddie-full #petition-clip{object-position:50% 45%}
+#result.eddie-full .petition-stage:after{background:radial-gradient(ellipse at 50% 45%,transparent 50%,#08060499 85%,#080604cc 100%),linear-gradient(#080604bb,transparent 16%,transparent 80%,#080604 100%)}
+#result.eddie-full #result-title{margin-top:10px}
+@media(min-width:900px) and (orientation:landscape){#result.eddie-full #petition-clip{object-fit:contain;object-position:50% 50%}#result.eddie-full .petition-stage:after{background:radial-gradient(ellipse at 50% 50%,transparent 55%,#080604 90%),linear-gradient(transparent 82%,#080604)}#result.eddie-full .result-totals{margin:4px auto 8px;padding:6px 0}#result.eddie-full .result-totals strong{font-size:24px}#result.eddie-full .petition-cta{padding:12px 20px}}

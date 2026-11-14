@@ -51,7 +51,7 @@ function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=24';
+const CACHE='?v=25';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -190,7 +190,7 @@ function petitionOpened(){try{return sessionStorage.getItem('eddie-petition-open
 function markPetitionOpened(){try{sessionStorage.setItem('eddie-petition-opened','1');}catch(_){}}
 
 function resetPetitionUi(){
- petitionPhase=null;
+ petitionPhase=null;if($('result'))$('result').classList.remove('eddie-full');
  const clip=$('petition-clip'),play=$('petition-play'),note=$('petition-note'),confirm=$('petition-confirm'),cap=$('petition-caption');
  if(clip){try{clip.pause();clip.removeAttribute('src');clip.load();}catch(_){}}
  if(play)play.hidden=true;
@@ -227,7 +227,7 @@ function playPetitionClip(which){
 
 function showLossPetition(){
  const box=$('result-petition');if(!box)return;
- box.hidden=false;petitionPhase='loss';
+ box.hidden=false;if($('result'))$('result').classList.add('eddie-full');petitionPhase='loss';
  const note=$('petition-note'),confirm=$('petition-confirm');
  if(note)note.hidden=true;if(confirm)confirm.hidden=true;
  playPetitionClip('loss');
@@ -235,7 +235,7 @@ function showLossPetition(){
 
 function showRefusePetition(){
  const box=$('result-petition');if(!box)return;
- box.hidden=false;petitionPhase='refuse';
+ box.hidden=false;if($('result'))$('result').classList.add('eddie-full');petitionPhase='refuse';
  if($('result')&&!$('result').open)$('result').showModal();
  const note=$('petition-note'),confirm=$('petition-confirm');
  if(note)note.hidden=false;if(confirm)confirm.hidden=false;
@@ -644,11 +644,11 @@ function startIntro(){
 $('intro-play').onclick=()=>{unlockAudio();if(!$('intro').hidden&&!reduced())playIntro();};
 $('intro-video').addEventListener('ended',()=>{if(!$('intro').hidden)stopIntro();});
 ['timeupdate','durationchange','loadedmetadata','seeking','emptied'].forEach(event=>$('intro-video').addEventListener(event,updateIntroProgress));
-$('roll').onclick=()=>{unlockAudio();playerRoll();};if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=requestNewGame;$('result-new').onclick=requestNewGame;$('result-close').onclick=()=>$('result').close();
+$('roll').onclick=()=>{unlockAudio();playerRoll();};if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=requestNewGame;$('result-new').onclick=requestNewGame;$('result-close').onclick=()=>{const c=$('petition-clip');if(c){try{c.pause();}catch(_){}}$('result').close();};
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
 $('sound').onclick=()=>{unlockAudio();sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));const clip=$('petition-clip');if(clip)clip.muted=!sound;if(sound)tableSound('hold');else stopTableSound();};
 $('skip-intro').onclick=()=>{unlockAudio();stopIntro();};$('replay-intro').onclick=startIntro;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('intro').hidden)stopIntro();});
-if($('petition-link'))$('petition-link').addEventListener('click',()=>{markPetitionOpened();});
+if($('petition-link'))$('petition-link').addEventListener('click',()=>{markPetitionOpened();});if($('petition-cta'))$('petition-cta').addEventListener('click',()=>{markPetitionOpened();});
 if($('petition-confirm'))$('petition-confirm').onclick=()=>{markPetitionOpened();newGame();};
 addEventListener('resize',()=>{if(!rolling){sizeDice();parkEddieHand();}});
 addEventListener('load',scheduleParkEddie);
