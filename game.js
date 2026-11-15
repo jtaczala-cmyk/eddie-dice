@@ -50,7 +50,8 @@ function scheduleChatter(){clearTimeout(chatTimer);return;chatTimer=setTimeout((
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=31';
+const CACHE='?v=34';
+const INTRO_SRC='intro/eddie_intro.mp4?v=34';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -124,7 +125,13 @@ async function playUrl(url,gainVal,owns){
 }
 
 async function preloadSfx(){
- await Promise.all(SFX_FILES.map(kind=>decodeUrl('sfx/'+kind+'.wav'+CACHE)));
+ // Decode the first-throw rattle immediately; finish the rest when the browser is idle
+ // so decodeAudioData does not hitch the opening gesture on iPhone.
+ await decodeUrl('sfx/rattle.wav'+CACHE);
+ const rest=SFX_FILES.filter(kind=>kind!=='rattle');
+ const later=()=>{Promise.all(rest.map(kind=>decodeUrl('sfx/'+kind+'.wav'+CACHE)));};
+ if(typeof requestIdleCallback==='function')requestIdleCallback(later,{timeout:2000});
+ else setTimeout(later,1);
 }
 
 async function unlockAudio(){
@@ -188,14 +195,84 @@ function tableSound(kind){
 function petitionOpened(){try{return sessionStorage.getItem('eddie-petition-opened')==='1';}catch(_){return false;}}
 function markPetitionOpened(){try{sessionStorage.setItem('eddie-petition-opened','1');}catch(_){}}
 
+const LOSS_CAPTION='Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!';
+const REFUSE_CAPTION='Spróbuj, kiedy podpiszesz petycję';
+// Word times from intro/v19-loss.mp4: Vosk small-en-us plus RMS energy (2026-11-15).
+// Polish words are revealed when the matching English phrase is spoken.
+const LOSS_CAPTION_WORDS=[
+ {t:0.20,text:'Przegrałeś!'}, // You lose!
+ {t:1.53,text:'A'},            // And
+ {t:1.71,text:'teraz'},        // now
+ {t:2.25,text:'czas'},         // time
+ {t:2.82,text:'zapłaty.'},     // payout
+ {t:4.18,text:'Podpisz'},      // Sign
+ {t:4.95,text:'petycję'},      // petition
+ {t:6.12,text:'– teraz!'}      // now!
+];
+let captionRaf=0;
+function stopCaptionSync(){if(captionRaf){cancelAnimationFrame(captionRaf);captionRaf=0;}}
+function setPlainCaption(text){
+ stopCaptionSync();
+ const cap=$('petition-caption');if(!cap)return;
+ cap.classList.remove('is-sync');
+ cap.removeAttribute('aria-label');
+ cap.textContent=text||LOSS_CAPTION;
+}
+function buildLossCaption(){
+ const cap=$('petition-caption');if(!cap)return;
+ cap.classList.add('is-sync');
+ cap.lang='pl';
+ cap.setAttribute('aria-label',LOSS_CAPTION);
+ cap.replaceChildren();
+ LOSS_CAPTION_WORDS.forEach((w,i)=>{
+  const word=document.createElement('span');
+  word.className='cap-word';
+  word.dataset.at=String(w.t);
+  [...w.text].forEach((ch,li)=>{
+   if(ch===' '||ch==='\u00a0'){word.appendChild(document.createTextNode(' '));return;}
+   const s=document.createElement('span');
+   s.className='cap-letter';
+   s.style.setProperty('--i',String(li));
+   s.textContent=ch;
+   word.appendChild(s);
+  });
+  cap.appendChild(word);
+  if(i<LOSS_CAPTION_WORDS.length-1)cap.appendChild(document.createTextNode(' '));
+ });
+}
+function revealCaption(t){
+ const cap=$('petition-caption');if(!cap)return;
+ cap.querySelectorAll('.cap-word').forEach(w=>{
+  const at=+w.dataset.at;
+  if(t+0.02>=at){
+   if(!w.classList.contains('is-on')){
+    if(t-at>0.3)w.classList.add('is-late');else w.classList.remove('is-late');
+    w.classList.add('is-on');
+   }
+  }else w.classList.remove('is-on','is-late');
+ });
+}
+function startCaptionSync(clip){
+ stopCaptionSync();
+ if(!clip)return;
+ const tick=()=>{
+  const cap=$('petition-caption');
+  if(!cap||!cap.classList.contains('is-sync')||!clip.isConnected){captionRaf=0;return;}
+  if(clip.ended){revealCaption(99);captionRaf=0;return;}
+  revealCaption(clip.currentTime||0);
+  captionRaf=requestAnimationFrame(tick);
+ };
+ tick();
+}
+
 function resetPetitionUi(){
  petitionPhase=null;clearBoard();if($('result'))$('result').classList.remove('eddie-full');
- const clip=$('petition-clip'),play=$('petition-play'),note=$('petition-note'),confirm=$('petition-confirm'),cap=$('petition-caption');
+ const clip=$('petition-clip'),play=$('petition-play'),note=$('petition-note'),confirm=$('petition-confirm');
  if(clip){try{clip.pause();clip.removeAttribute('src');clip.load();}catch(_){}}
  if(play)play.hidden=true;
  if(note)note.hidden=true;
  if(confirm)confirm.hidden=true;
- if(cap)cap.textContent='Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!';
+ setPlainCaption(LOSS_CAPTION);
 }
 
 // v19: when Eddie's clip ends, fade the video out and show a clean end board
@@ -203,13 +280,13 @@ function resetPetitionUi(){
 let boardTimer=null;
 function clearBoard(){clearTimeout(boardTimer);const r=$('result');if(r)r.classList.remove('clip-fading','clip-board');const rp=$('petition-replay');if(rp)rp.hidden=true;}
 function showBoard(){const r=$('result');if(!r||!r.classList.contains('eddie-full'))return;clearTimeout(boardTimer);r.classList.add('clip-fading');const play=$('petition-play');if(play)play.hidden=true;boardTimer=setTimeout(()=>{r.classList.add('clip-board');const rp=$('petition-replay');if(rp)rp.hidden=false;},620);}
-function replayPetitionClip(){const clip=$('petition-clip'),play=$('petition-play');if(!clip)return;clearBoard();if(play)play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}clip.play().catch(()=>{clip.muted=true;clip.play().catch(()=>{});if(play&&sound)play.hidden=false;});}
+function replayPetitionClip(){const clip=$('petition-clip'),play=$('petition-play');if(!clip)return;clearBoard();if(play)play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}if(petitionPhase==='loss'){buildLossCaption();startCaptionSync(clip);}clip.play().catch(()=>{clip.muted=true;clip.play().catch(()=>{});if(play&&sound)play.hidden=false;});}
 
 function playPetitionClip(which){
  const clip=$('petition-clip'),play=$('petition-play'),cap=$('petition-caption');
  if(!clip)return;
  const base=which==='refuse'?'intro/v19-refuse':'intro/v19-loss';
- if(cap)cap.textContent=which==='refuse'?'Spróbuj, kiedy podpiszesz petycję':'Przegrałeś! A teraz czas zapłaty. Podpisz petycję – teraz!';
+ if(which==='refuse')setPlainCaption(REFUSE_CAPTION);else{buildLossCaption();}
  try{clip.pause();}catch(_){}
  clip.setAttribute('playsinline','');clip.setAttribute('webkit-playsinline','');clip.playsInline=true;
  clip.poster=base+'-poster.jpg'+CACHE;
@@ -217,7 +294,8 @@ function playPetitionClip(which){
  try{clip.load();}catch(_){}
  if(play){play.hidden=true;play.textContent='Posłuchaj Eddiego';}
  clearBoard();
- clip.onended=showBoard;
+ if(which!=='refuse')startCaptionSync(clip);
+ clip.onended=()=>{revealCaption(99);showBoard();};
  // iOS: unmuted play() outside a tap is refused; start muted so the
  // animation always runs, and offer a tap to restart it with sound.
  clip.muted=!sound;
@@ -229,7 +307,7 @@ function playPetitionClip(which){
   if(q&&q.catch)q.catch(()=>{if(play)play.hidden=false;});
  });
  if(sound&&play)setTimeout(()=>{if(clip.muted&&!clip.ended)play.hidden=false;},400);
- if(play)play.onclick=()=>{play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}clip.play().catch(()=>{play.hidden=false;});};
+ if(play)play.onclick=()=>{play.hidden=true;unlockAudio();clip.muted=!sound;try{clip.currentTime=0;}catch(_){}if(petitionPhase==='loss'){buildLossCaption();startCaptionSync(clip);}clip.play().catch(()=>{play.hidden=false;});};
  const rp=$('petition-replay');if(rp)rp.onclick=replayPetitionClip;
 }
 
@@ -289,7 +367,7 @@ function dieCube(value){
  const sides=faces.map(([v,cls])=>`<span class="side ${cls}" data-value="${v}">${dieContents(v)}</span>`).join('');
  return `<span class="die-space"><span class="cube" style="transform:${faceTransform(value)}">${sides}</span></span>`;
 }
-function sizeDice(){for(const b of $('dice').children){const w=b.offsetWidth;if(w)b.style.setProperty('--half',(w/2)+'px');}}
+function sizeDice(){const kids=[...$('dice').children];const widths=kids.map(b=>b.offsetWidth);kids.forEach((b,i)=>{if(widths[i])b.style.setProperty('--half',(widths[i]/2)+'px');});}
 function renderDice() {
  const tray=$('dice');tray.replaceChildren();
  state.dice.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.className='die'+(state.held[i]?' held':'');b.style.setProperty('--tilt',TILT[i]+'deg');b.innerHTML=dieCube(v);b.disabled=state.turn!=='player'||state.rolls===0||rolling||state.rolls>=3;b.setAttribute('aria-label',`Kość ${i+1}: ${state.rolls?v:'jeszcze nie rzucona'}${state.held[i]?', zatrzymana':''}`);b.setAttribute('aria-pressed',String(state.held[i]));b.onclick=()=>{state.held[i]=!state.held[i];tableSound('hold');renderDice();$('dice').children[i].focus({preventScroll:true});};tray.append(b);});
@@ -421,7 +499,7 @@ function setEddieThrowing(on){
 }
 function resetPlayerHand(){
  const hand=$('player-hand');if(!hand)return;
- cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);
+ cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);hand.classList.remove('is-animating');
  hand.style.transform='';hand.style.opacity='';hand.style.left='';hand.style.top='';
  for(const el of hand.querySelectorAll('.pose-frame,.pose-shut,.pose-open')){
   el.style.opacity='';el.style.transform='';
@@ -464,9 +542,8 @@ function clearRestHand(cand,root,felt,ctx){
 
 function parkEddieHand(){
  const hand=$('eddie-fist');if(!hand)return;
- void document.body.offsetHeight;
  cancelAnims(hand);hand.querySelectorAll('*').forEach(cancelAnims);
- setEddieThrowing(false);
+ setEddieThrowing(false);hand.classList.remove('is-animating');
  hand.style.transform='';hand.style.opacity='';
  const slot=eddieRestSlot();
  if(!slot){hand.style.opacity='1';return;}
@@ -532,6 +609,7 @@ async function pour(token,{who,held,finals}){
   {transform:'translate(0px,0px) rotate(0deg)',opacity:1,offset:.62},
   {transform:`translate(0px,${exitY}px) rotate(8deg)`,opacity:0,offset:1}
  ];
+ hand.classList.add('is-animating');
  pending.push(hand.animate(handKeys,{duration:T,fill:'both',easing:'linear'}));
  const pose={duration:T,fill:'both',easing:'linear'};
  const frames=[...hand.querySelectorAll('.pose-frame')].sort((a,b)=>(+a.dataset.frame)-(+b.dataset.frame));
@@ -622,6 +700,21 @@ function finish(){
  $('hint').textContent='Pojedynek zakończony. Tabela trzech serii pozostaje do wglądu.';render();$('result').showModal();
 }
 function newGame(){version++;rolling=false;clearThrow();stopTableSound();state={player:Array(E.SERIES).fill(null),eddie:Array(E.SERIES).fill(null),dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),series:1,rolls:0,turn:'player'};lastResult=null;resetPetitionUi();if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleParkEddie();scheduleChatter();}
+function hydrateHands(){
+ document.querySelectorAll('.hand-art[data-src]').forEach(img=>{
+  if(!img.getAttribute('src'))img.src=img.getAttribute('data-src');
+ });
+}
+function ensureIntroMedia(){
+ const video=$('intro-video');if(!video)return null;
+ if(video.getAttribute('src')!==INTRO_SRC){video.src=INTRO_SRC;try{video.load();}catch(_){}}
+ return video;
+}
+function releaseIntroMedia(){
+ const video=$('intro-video');if(!video)return;
+ try{video.pause();}catch(_){}
+ if(video.getAttribute('src')){try{video.removeAttribute('src');video.load();}catch(_){}}
+}
 function updateIntroProgress(){
  const video=$('intro-video');
  const fraction=Number.isFinite(video.duration)&&video.duration>0?Math.min(1,Math.max(0,video.currentTime/video.duration)):0;
@@ -629,8 +722,8 @@ function updateIntroProgress(){
 }
 function stopIntro(){
  clearTimeout(introTimer);introRun++;
- const video=$('intro-video');video.pause();try{video.currentTime=0;}catch(_){}
- $('intro-play').hidden=true;$('intro').hidden=true;updateIntroProgress();
+ releaseIntroMedia();
+ $('intro-play').hidden=true;$('intro').hidden=true;hydrateHands();updateIntroProgress();
  document.querySelector('.app-shell').inert=false;scheduleParkEddie();
  try{sessionStorage.setItem('eddie-intro','seen');}catch(_){}
  assertPlaybackSession();resumeContext();
@@ -638,13 +731,15 @@ function stopIntro(){
 }
 async function playIntro(){
  const run=introRun;$('intro-play').hidden=true;
- try{await $('intro-video').play();}
+ const video=ensureIntroMedia();
+ try{await video.play();}
  catch(_){if(run===introRun&&!$('intro').hidden){$('intro-play').hidden=false;$('intro-play').focus({preventScroll:true});}}
 }
 function startIntro(){
  clearTimeout(introTimer);introRun++;stopTableSound();clearTimeout(chatTimer);
  if($('rules').open)$('rules').close();if($('result').open)$('result').close();
- const video=$('intro-video');video.pause();try{video.currentTime=0;}catch(_){}
+ const video=ensureIntroMedia();
+ if(video){try{video.pause();video.currentTime=0;}catch(_){}}
  $('intro').hidden=false;$('intro-play').hidden=true;document.querySelector('.app-shell').inert=true;updateIntroProgress();
  $('skip-intro').focus({preventScroll:true});
  if(reduced()){introTimer=setTimeout(stopIntro,4000);}else playIntro();
@@ -652,15 +747,27 @@ function startIntro(){
 $('intro-play').onclick=()=>{unlockAudio();if(!$('intro').hidden&&!reduced())playIntro();};
 $('intro-video').addEventListener('ended',()=>{if(!$('intro').hidden)stopIntro();});
 ['timeupdate','durationchange','loadedmetadata','seeking','emptied'].forEach(event=>$('intro-video').addEventListener(event,updateIntroProgress));
-$('roll').onclick=()=>{unlockAudio();playerRoll();};if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=requestNewGame;$('result-new').onclick=requestNewGame;$('result-close').onclick=()=>{const c=$('petition-clip');if(c){try{c.pause();}catch(_){}}clearBoard();$('result').close();};
+$('roll').onclick=()=>{unlockAudio();playerRoll();};if($('save'))$('save').onclick=saveSeries;$('new-game').onclick=requestNewGame;$('result-new').onclick=requestNewGame;$('result-close').onclick=()=>{const c=$('petition-clip');if(c){try{c.pause();}catch(_){}}stopCaptionSync();clearBoard();$('result').close();};
 $('rules-open').onclick=()=>$('rules').showModal();document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>$('rules').close());
 $('sound').onclick=()=>{unlockAudio();sound=!sound;$('sound').textContent='Dźwięk: '+(sound?'wł.':'wył.');$('sound').setAttribute('aria-pressed',String(sound));const clip=$('petition-clip');if(clip)clip.muted=!sound;if(sound)tableSound('hold');else stopTableSound();};
 $('skip-intro').onclick=()=>{unlockAudio();stopIntro();};$('replay-intro').onclick=startIntro;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('intro').hidden)stopIntro();});
 if($('petition-link'))$('petition-link').addEventListener('click',()=>{markPetitionOpened();});if($('petition-cta'))$('petition-cta').addEventListener('click',()=>{markPetitionOpened();});
 if($('petition-confirm'))$('petition-confirm').onclick=()=>{markPetitionOpened();newGame();};
-addEventListener('resize',()=>{if(!rolling){sizeDice();parkEddieHand();}});
+let resizeTimer;addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(!rolling){sizeDice();parkEddieHand();}},120);});
 addEventListener('load',scheduleParkEddie);
 armUnlock();
-newGame();let seen=false;try{seen=sessionStorage.getItem('eddie-intro')==='seen';}catch(_){}if(seen){$('intro').hidden=true;}else startIntro();
+document.addEventListener('visibilitychange',()=>{
+ document.documentElement.classList.toggle('page-hidden',document.hidden);
+ const video=$('intro-video');
+ if(!video||$('intro').hidden)return;
+ if(document.hidden){
+  if(!video.paused){video.dataset.resume='1';try{video.pause();}catch(_){}}
+ }else if(video.dataset.resume==='1'){
+  video.dataset.resume='';video.play().catch(()=>{});
+ }
+});
+const introVideo=$('intro-video');
+if(introVideo)introVideo.addEventListener('error',()=>{if(!$('intro').hidden){$('intro-play').hidden=false;$('skip-intro').focus({preventScroll:true});}});
+newGame();let seen=false;try{seen=sessionStorage.getItem('eddie-intro')==='seen';}catch(_){}if(seen){$('intro').hidden=true;hydrateHands();}else startIntro();
 
 window.__throw=(who,finals)=>pour(version,{who,held:Array(5).fill(false),finals:finals||[5,4,3,6,2]});

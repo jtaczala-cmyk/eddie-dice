@@ -7,7 +7,7 @@
  const motion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  function show(next){
   index=(next+nations.length)%nations.length;const entry=nations[index];
-  const flag=byId('tour-flag');flag.src=entry.flag;flag.alt='Flaga: '+entry.name;
+  const flag=byId('tour-flag');flag.src=entry.flag+(entry.flag.includes('?')?'':'?v=34');flag.alt='Flaga: '+entry.name;
   byId('tour-country').textContent=entry.name;
   const date=byId('tour-date');date.replaceChildren();date.setAttribute('aria-label',entry.date);
   if(entry.datePrecision==='day'){const [day,month,year]=entry.date.split('.');date.dateTime=year+'-'+month+'-'+day;}else date.dateTime=entry.date;
