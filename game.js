@@ -40,18 +40,17 @@ const moodFor={great:'unimpressed',beast:'pleased',bad:'pleased',eddieGreat:'ple
 function say(type,m) {
  let text,lang='en';
  if(Math.random()<.4&&foreign[type]){[lang,text]=pick(foreign[type]);}else if(Math.random()<.4&&!foreign[type]&&type!=='welcome'){[lang,text]=pick(foreign.normal);}else text=pick(lines[type]||lines.normal);
- $('quote').textContent='“'+text+'”';$('quote').lang=lang;
- const b=$('bubble');if(b){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
+ // v21: Eddie's sayings are no longer shown anywhere (Jacek, 2026-11-15).
  mood(m||moodFor[type]||'speaking');
  // Rolling text stays on the banner. In-game lines are on-screen only — no spoken MP3s.
  return {text,lang};
 }
-function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(state.turn==='player'&&!rolling&&$('intro').hidden){say('idle');scheduleChatter();}},12000+Math.random()*6000);}
+function scheduleChatter(){clearTimeout(chatTimer);return;chatTimer=setTimeout(()=>{if(state.turn==='player'&&!rolling&&$('intro').hidden){say('idle');scheduleChatter();}},12000+Math.random()*6000);}
 // Table SFX and Eddie's spoken lines never share volume with the intro film.
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=30';
+const CACHE='?v=31';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -614,7 +613,7 @@ async function eddieTurn(token){
 }
 function finish(){
  clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');state.turn='finished';const p=seriesSum('player'),e=seriesSum('eddie');const type=p>e?'win':p<e?'lose':'draw';lastResult=type;const spoken=say(type);
- $('result-title').textContent=p>e?'Los uchylił ci kapelusza.':p<e?'Eddie zgarnia stawkę.':'Remis. Noc bez zwycięzcy.';$('result-quote').textContent='“'+spoken.text+'”';$('result-quote').lang=spoken.lang;
+ $('result-title').textContent=p>e?'Los uchylił ci kapelusza.':p<e?'Eddie zgarnia stawkę.':'Remis. Noc bez zwycięzcy.';$('result-quote').textContent='';
  const row=(who,label)=>`<div><small>${label}</small><span class="series-pips">${state[who].map(v=>v==null?'—':v).join(' + ')}</span><strong>${seriesSum(who)}</strong></div>`;
  $('result-totals').innerHTML=row('player','TY')+'<span>:</span>'+row('eddie','EDDIE');
  resetPetitionUi();
