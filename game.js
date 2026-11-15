@@ -51,7 +51,7 @@ function scheduleChatter(){clearTimeout(chatTimer);chatTimer=setTimeout(()=>{if(
 // iOS: WebAudio is muted by the Ring/Silent switch unless the session is
 // 'playback'; delayed new Audio().play() is also often blocked outside a
 // gesture. We unlock once, keep the context running, and play from buffers.
-const CACHE='?v=29';
+const CACHE='?v=30';
 const SFX_FILES=['rattle','clack-1','clack-2','clack-3','landing','hold','stamp'];
 const PETITION_URL='https://www.change.org/p/iron-maiden-eddie-to-wax';
 const activeSfx=new Set();
@@ -326,7 +326,7 @@ function render() {
  $('roll').disabled=!canRoll;
  $('roll').innerHTML=rolling?'Kości w ruchu…':state.rolls===0?'Rzuć kośćmi <span>↗</span>':'Rzuć ponownie <span>↗</span>';
  if($('save')){$('save').disabled=!canSave;$('save').classList.toggle('ready',canSave&&state.rolls===3);}
- $('roll-note').textContent=state.turn==='finished'?'Dwie serie. Jeden werdykt.':state.turn==='eddie'?'Eddie rzuca w tej serii…':state.rolls===0?'Pierwszy rzut wszystkimi pięcioma kośćmi':state.rolls===3?'To ostatni rzut. Zapisz sumę oczek.':`Zatrzymaj kości albo rzuć ponownie. Pozostało poprawek: ${3-state.rolls}`;
+ $('roll-note').textContent=state.turn==='finished'?'Trzy serie. Jeden werdykt.':state.turn==='eddie'?'Eddie rzuca w tej serii…':state.rolls===0?'Pierwszy rzut wszystkimi pięcioma kośćmi':state.rolls===3?'To ostatni rzut. Zapisz sumę oczek.':`Zatrzymaj kości albo rzuć ponownie. Pozostało poprawek: ${3-state.rolls}`;
  renderDice();renderCard();
 }
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,window.__fast?0:ms));
@@ -620,7 +620,7 @@ function finish(){
  resetPetitionUi();
  $('result-petition').hidden=type!=='lose';
  if(type==='lose'){showLossPetition();$('result-quote').textContent='“You lose! And now it\'s time for the payout. Sign the petition now!”';$('result-quote').lang='en';}
- $('hint').textContent='Pojedynek zakończony. Tabela dwóch serii pozostaje do wglądu.';render();$('result').showModal();
+ $('hint').textContent='Pojedynek zakończony. Tabela trzech serii pozostaje do wglądu.';render();$('result').showModal();
 }
 function newGame(){version++;rolling=false;clearThrow();stopTableSound();state={player:Array(E.SERIES).fill(null),eddie:Array(E.SERIES).fill(null),dice:[1,2,3,4,5],eddieDice:[1,2,3,4,5],held:Array(5).fill(false),series:1,rolls:0,turn:'player'};lastResult=null;resetPetitionUi();if($('result').open)$('result').close();$('hint').textContent='Rzuć kośćmi. Potem zatrzymaj te, którym ufasz.';$('eddie-action').textContent='Czeka na twój pierwszy ruch.';renderMini();clearTimeout(chatTimer);$('duel').classList.remove('eddie-turn');say('welcome');render();scheduleParkEddie();scheduleChatter();}
 function updateIntroProgress(){
